@@ -1,0 +1,24 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "declaration": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "types": [
+      "mocha",
+      "chai"
+    ],
+    "lib": [
+      "DOM",
+      "ES2017"
+    ],
+  },
+  "include": [
+    "src/*.ts",
+  ],
+  "exclude": [
+    "tests/*.ts",
+  ]
+}

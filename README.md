@@ -40,12 +40,16 @@ console.log(url)
 
 ### Constructor
 
-The constructor accepts a host, params (optional) and protocol (optional, defaulted to _http://_, _http://_ or _https://_ for now), like so:
+The constructor accepts a host and params (optional):
 
 ```js
 import { FlexUrl } from 'flex-url';
 
-new FlexURL('my.website.com', {}, 'https://')
+new FlexURL('my.website.com')
+// my.website.com
+
+new FlexURL('my.website.com', { test: 'foo' })
+// my.website.com?test=foo
 ```
 
 ### getQuery

@@ -1,9 +1,8 @@
 import * as querystring from "qss"
 
 export type SortDirection = 'asc' | 'desc';
-export type UrlProtocol = 'http://' | 'https://';
 
-const regex = /(http[s]?:\/\/)?([^\/\s]+\/)(.*)/;
+const regex = /(?:https?:\/\/)?(?:[^?\/\s]+[?\/])(.*)/;
 
 export function createFlexUrl(url: string | Record<string, unknown>): FlexUrl {
   const strigifiedUrl = typeof url === "string" ? url : url.toString();
@@ -13,21 +12,28 @@ export function createFlexUrl(url: string | Record<string, unknown>): FlexUrl {
     return new FlexUrl(strigifiedUrl);
   }
 
-  return new FlexUrl(
-    matchedFragments[2],
-    querystring.decode(matchedFragments[3] ? matchedFragments[3].split('?')[1] : '')
-  );
+  let matchedPathFragments: Array<string> = []
+
+  if (matchedFragments[1]) {
+    matchedPathFragments = matchedFragments[1].split('?')
+  }
+
+  if (matchedPathFragments.length > 1 && matchedPathFragments[1]) {
+    return new FlexUrl(
+      matchedFragments[0].replace(`?${matchedPathFragments[1]}`, ''),
+      querystring.decode(matchedPathFragments[1])
+    );
+  }
+
+  return new FlexUrl(matchedFragments[0]);
 }
 
 export class FlexUrl {
-  protocol: UrlProtocol;
-
   host: string;
 
   params: Partial<Record<string, string | Array<string>>>;
 
-  constructor(host: string, params: Partial<Record<string, string>> = {}, protocol: UrlProtocol = 'http://') {
-    this.protocol = protocol;
+  constructor(host: string, params: Partial<Record<string, string>> = {}) {
     this.host = host;
     this.params = params;
   }
@@ -46,7 +52,7 @@ export class FlexUrl {
     if (value && hasKey) {
       return typeof this.params[key] === 'string'
         ? this.params[key] === value
-        : this.params[key]?.indexOf(value) !== -1;
+        : (this.params[key] as Array<string>).indexOf(value) !== -1;
     }
 
     return hasKey;
@@ -217,6 +223,6 @@ export class FlexUrl {
   }
 
   toString(): string {
-    return this.protocol + this.host + this.getQuery();
+    return this.host + this.getQuery();
   }
 }

@@ -4,8 +4,13 @@ import { expect } from 'chai';
 const url = 'http://api.mywebsite.com/'
 
 describe('createFlexUrl', () => {
-  it('url parsed and to string properly going back', () => {
+  it('url parsed and going back to string properly', () => {
     expect(createFlexUrl(url).toString()).to.be.eq(url);
+    expect(createFlexUrl('localhost:8000/test').toString()).to.be.eq('localhost:8000/test');
+  });
+
+  it('url parser can handle special characters', () => {
+    expect(createFlexUrl('localhost:8000/test').addQuery('foo', '🤙').toString()).to.be.eq(encodeURI('localhost:8000/test?foo=🤙'));
   });
 });
 

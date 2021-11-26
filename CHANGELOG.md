@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2020-11-26
+
+### Changed
+
+- Add `and` parameter to method `filterBy()` for filter with _OR_ operand (`filter[myattribute]=one,two`)
+
+### Added
+
+- Add `orFilterBy()` same as the one in `filterBy` (alias)
+
 ## [0.3.0] - 2020-11-26
 
 ### Added

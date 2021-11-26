@@ -102,8 +102,22 @@ export class FlexUrl {
     return this.addQuery(key, value);
   }
 
-  filterBy(key: string, value: string): this {
-    return this.query(`filter[${key}]`, value);
+  filterBy(key: string, value: string, and = true): this {
+    const filterQueryKey = `filter[${key}]`;
+    const previousFilterValue = this.getQuery(filterQueryKey);
+    let filterValuesArr = value.split(',');
+
+    if (!and && previousFilterValue) {
+      filterValuesArr = (typeof previousFilterValue === 'string'
+        ? previousFilterValue.split(',')
+        : previousFilterValue).concat(filterValuesArr);
+    }
+    
+    return this.query(filterQueryKey, filterValuesArr.join(','));
+  }
+
+  orFilterBy(key: string, value: string): this {
+    return this.filterBy(key, value, false);
   }
 
   hasFilter(key: string, value = '') {

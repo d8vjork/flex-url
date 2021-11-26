@@ -102,6 +102,14 @@ describe('FlexUrl', () => {
       expect(createFlexUrl(url).filterBy('foo', 'bar').filterBy('foo', 'test').hasFilter('foo', 'test')).to.be.true;
       expect(createFlexUrl(url).filterBy('foo', 'bar').filterBy('foo', 'test').toString()).to.be.eq(encodeURI(url + '?filter[foo]=test'));
     });
+    
+    it('url adding a filter foo=bar and replace with bar OR test', () => {
+      const flexUrl = createFlexUrl(url).filterBy('foo', 'bar').filterBy('foo', 'test', false);
+
+      expect(flexUrl.getFilters()).to.contain('foo');
+      expect(flexUrl.getQuery('filter[foo]')).to.be.eq('bar,test');
+      expect(flexUrl.orFilterBy('foo', 'hello').getQuery('filter[foo]')).to.be.eq('bar,test,hello');
+    });
   })
   
   describe('#getFilters', () => {

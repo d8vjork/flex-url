@@ -104,6 +104,12 @@ describe('FlexUrl', () => {
     });
   })
   
+  describe('#getFilters', () => {
+    it('url with filters getting all of the attributes filtered as array', () => {
+      expect(createFlexUrl(url).filterBy('foo', 'bar').filterBy('bar', 'test').getFilters()).to.have.members(['foo', 'bar']);
+    });
+  });
+
   describe('#clearFilters', () => {
     it('url with filters removing all of them', () => {
       expect(createFlexUrl(url).filterBy('foo', 'bar').filterBy('bar', 'test').clearFilters().getQuery()).to.be.empty;

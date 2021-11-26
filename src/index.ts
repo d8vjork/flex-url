@@ -110,6 +110,22 @@ export class FlexUrl {
     return this.hasQuery(`filter[${key}]`, value);
   }
 
+  getFilters() {
+    let filterAttrs: Array<string> = []
+    let cursor: string | undefined 
+    const paramsKeysArr = Object.keys(this.params)
+
+    while (cursor = paramsKeysArr.pop()) {
+      let paramFragments = cursor.split('[')[1];
+
+      if (paramFragments) {
+        filterAttrs.push(paramFragments.split(']')[0])
+      }
+    }
+
+    return filterAttrs;
+  }
+
   clearFilters(except: Array<string> = []): this {
     return this.removeQuery(function (param) {
       const filterParamFragments = param.split('[');

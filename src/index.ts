@@ -119,7 +119,7 @@ export class FlexUrl {
         : previousFilterValue).concat(filterValuesArr);
     }
     
-    return this.query(filterQueryKey, filterValuesArr.join(','));
+    return this.setQuery(filterQueryKey, filterValuesArr.join(','));
   }
 
   orFilterBy(key: string, value: string): this {

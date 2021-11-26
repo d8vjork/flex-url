@@ -1,7 +1,7 @@
 import * as querystring from "qss"
 
-declare type SortDirection = 'asc' | 'desc';
-declare type UrlProtocol = 'http://' | 'https://';
+export type SortDirection = 'asc' | 'desc';
+export type UrlProtocol = 'http://' | 'https://';
 
 const regex = /(http[s]?:\/\/)?([^\/\s]+\/)(.*)/;
 
@@ -66,7 +66,18 @@ export class FlexUrl {
     return this;
   }
 
-  removeQuery(key: string, value = ''): this {
+  removeQuery(key: ((params: string) => boolean) | string, value = ''): this {
+    if (typeof key === "function") {
+      let cursor: string | undefined;
+      const paramsKeysArr = Object.keys(this.params);
+
+      while (cursor = paramsKeysArr.pop()) {
+        key(cursor) === true ? delete this.params[cursor] : true;
+      }
+
+      return this;
+    }
+    
     if (!this.params[key]) {
       return this;
     }
@@ -97,6 +108,19 @@ export class FlexUrl {
 
   hasFilter(key: string, value = '') {
     return this.hasQuery(`filter[${key}]`, value);
+  }
+
+  clearFilters(except: Array<string> = []): this {
+    return this.removeQuery(function (param) {
+      const filterParamFragments = param.split('[');
+      let condition = filterParamFragments[0] === 'filter';
+
+      if (condition && except.length > 0) {
+        condition &&= except.indexOf(filterParamFragments[1].split(']')[0]) === -1;
+      }
+
+      return condition;
+    });
   }
 
   getSorts<B extends boolean>(asObject: B): B extends true ? Record<string, SortDirection> : Array<string>;
@@ -154,6 +178,12 @@ export class FlexUrl {
   
   sortByAsc(value: string): this {
     return this.sortBy(value, 'asc')
+  }
+
+  clearSorts(): this {
+    this.removeQuery('sort');
+
+    return this;
   }
 
   toString(): string {

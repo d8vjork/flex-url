@@ -86,15 +86,31 @@ describe('FlexUrl', () => {
     });
   })
 
+  describe('#clearSorts', () => {
+    it('url with sorts removing all of them', () => {
+      expect(createFlexUrl(url).sortBy('created-at', 'desc').sortBy('test').clearSorts().getSortsAsArray()).to.be.empty;
+    });
+  })
+
   describe('#filterBy', () => {
-    it('url adding a filter using filterBy foo=bar', () => {
+    it('url adding a filter foo=bar', () => {
       expect(createFlexUrl(url).filterBy('foo', 'bar').hasFilter('foo')).to.be.true;
       expect(createFlexUrl(url).filterBy('foo', 'bar').toString()).to.be.eq(encodeURI(url + '?filter[foo]=bar'));
     });
 
-    it('url adding a filter using filterBy foo=bar and replace it with foo=test', () => {
+    it('url adding a filter foo=bar and replace it with foo=test', () => {
       expect(createFlexUrl(url).filterBy('foo', 'bar').filterBy('foo', 'test').hasFilter('foo', 'test')).to.be.true;
       expect(createFlexUrl(url).filterBy('foo', 'bar').filterBy('foo', 'test').toString()).to.be.eq(encodeURI(url + '?filter[foo]=test'));
+    });
+  })
+  
+  describe('#clearFilters', () => {
+    it('url with filters removing all of them', () => {
+      expect(createFlexUrl(url).filterBy('foo', 'bar').filterBy('bar', 'test').clearFilters().getQuery()).to.be.empty;
+    });
+    
+    it('url with filters removing all of them except one', () => {
+      expect(createFlexUrl(url).filterBy('foo', 'bar').filterBy('bar', 'test').clearFilters(['foo']).getQuery()).to.be.eq(encodeURI('?filter[foo]=bar'));
     });
   })
 });

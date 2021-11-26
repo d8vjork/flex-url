@@ -166,6 +166,20 @@ createFlexUrl('http://api.mywebsite.com/?filter%5Bfoo%5D=bar').hasFilter('foo', 
 // returns false
 ```
 
+### clearFilters
+
+Remove filters with the exception of the ones sent as first parameter as array of attribute names (optional):
+
+```js
+import { createFlexUrl } from 'flex-url';
+
+createFlexUrl('http://api.mywebsite.com/?filter%5Bfoo%5D=bar&filter%5Btest%5D=bar').clearFilters().toString()
+// returns 'http://api.mywebsite.com/
+
+createFlexUrl('http://api.mywebsite.com/?filter%5Bfoo%5D=bar&filter%5Btest%5D=bar').clearFilters(['foo']).toString()
+// returns 'http://api.mywebsite.com/?filter%5Bfoo%5D=bar'
+```
+
 ### toString
 
 Formats the URL back to string.

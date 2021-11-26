@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2020-11-26
+
+### Added
+
+- Module exports 2 more types: `SortDirection` and `UrlProtocol`
+- Method `clearFilters(except = [])` for remove all or some filter query parameters
+
 ## [0.1.1] - 2020-11-25
 
 ### Added

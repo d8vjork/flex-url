@@ -9,9 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.0] - 2020-11-26
 
+### Changed
+
+- Add function type as first parameter (key) to method `removeQuery()` for removing multiple parameters conditionally
+
 ### Added
 
 - Module exports 2 more types: `SortDirection` and `UrlProtocol`
+- Method `clearSorts()` for remove all sorts
 - Method `clearFilters(except = [])` for remove all or some filter query parameters
 
 ## [0.1.1] - 2020-11-25

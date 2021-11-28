@@ -1,4 +1,4 @@
-import * as querystring from "qss"
+import * as querystring from "./qss"
 
 export type SortDirection = 'asc' | 'desc';
 
@@ -21,7 +21,7 @@ export function createFlexUrl(url: string | Record<string, unknown>): FlexUrl {
   if (matchedPathFragments.length > 1 && matchedPathFragments[1]) {
     return new FlexUrl(
       matchedFragments[0].replace(`?${matchedPathFragments[1]}`, ''),
-      querystring.decode(matchedPathFragments[1])
+      querystring.decode(matchedPathFragments[1], false, false)
     );
   }
 

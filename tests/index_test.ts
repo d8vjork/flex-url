@@ -115,6 +115,12 @@ describe('FlexUrl', () => {
       expect(flexUrl.getQuery('filter[foo]')).to.be.eq('bar,test');
       expect(flexUrl.orFilterBy('foo', 'hello').getQuery('filter[foo]')).to.be.eq('bar,test,hello');
     });
+    
+    it('adding OR filters with integers over a parsed url', () => {
+      const parsedUrl = createFlexUrl(url).filterBy('foo', '1').toString();
+
+      expect(createFlexUrl(parsedUrl).orFilterBy('foo', '2')).to.be.ok;
+    });
   })
   
   describe('#getFilters', () => {

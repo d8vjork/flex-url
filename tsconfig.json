@@ -3,6 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "noEmit": true,
+    "allowJs": true,
     "declaration": true,
     "moduleResolution": "node",
     "esModuleInterop": true,

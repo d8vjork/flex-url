@@ -188,6 +188,18 @@ createFlexUrl('http://api.mywebsite.com/?filter%5Bfoo%5D=bar&filter%5Btest%5D=ba
 
 Formats the URL back to string.
 
+## Benchmarks
+
+And here some benchmarks to show up why this library is not only the easiest to use alternative (even for native ones):
+
+```sh
+createFlexUrl           x 3,040,944 ops/sec ±1.47% (89 runs sampled)
+url-parse               x 562,052 ops/sec ±3.57% (87 runs sampled)
+URL (browser native)    x 407,001 ops/sec ±2.09% (86 runs sampled)
+```
+
+**Also note that this is the result of just doing parsing on the query search part of the URL.**
+
 ## License
 
 This package is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

@@ -18,23 +18,18 @@ export function encode(obj: Record<string, any>, prefix = '') {
   return (prefix || '') + str;
 }
 
-function toValue(mix: string | undefined, tcBools: boolean, tcNumbers: boolean) {
+function toValue(mix: string | undefined) {
   if (!mix) return '';
   var str = decodeURIComponent(mix);
-  if (tcBools && str === 'false') return false;
-  if (tcBools && str === 'true') return true;
 
-  return (tcNumbers && +str * 0 === 0) ? (+str) : str;
+  return str + '';
 }
 
-export function decode(str: string, tcBools: boolean, tcNumbers: boolean) {
+export function decode(str: string) {
   let cursor
   let k
   let out: Record<string, any> = {}
   let arr = str.split('&');
-  
-  tcBools = typeof tcBools !== 'undefined' ? tcBools : true;
-  tcNumbers = typeof tcNumbers !== 'undefined' ? tcNumbers : true;
 
   while (cursor = arr.pop()) {
     cursor = cursor.split('=');
@@ -42,9 +37,9 @@ export function decode(str: string, tcBools: boolean, tcNumbers: boolean) {
     let outt = out[k]
 
     if (outt !== void 0) {
-      out[k] = ([] as Array<string>).concat(outt, toValue(cursor.shift(), tcBools, tcNumbers) as string);
+      out[k] = ([] as Array<string>).concat(outt, toValue(cursor.shift()) as string);
     } else {
-      out[k] = toValue(cursor.shift(), tcBools, tcNumbers);
+      out[k] = toValue(cursor.shift());
     }
   }
 

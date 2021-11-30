@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2020-11-30
+
+### Added
+
+- `getFiltersAsObject` method that returns filters (attributes with its filtered values)
+
+### Fixed
+
+- Regression: Query params parser in browser not getting strings from params
+
 ## [0.4.3] - 2020-11-29
 
 ### Fixed

@@ -128,10 +128,17 @@ describe('FlexUrl', () => {
       expect(createFlexUrl(url).filterBy('foo', 'bar').filterBy('bar', 'test').getFilters()).to.have.members(['foo', 'bar']);
     });
   });
+  
+  describe('#getFiltersAsObject', () => {
+    it('url with filters getting all of the attributes filtered as object', () => {
+      expect(createFlexUrl(url).query('foo[test]', 'bar').filterBy('foo', 'bar').filterBy('bar', 'test').getFiltersAsObject()).to.be.deep.eq({ foo: 'bar', bar: 'test' });
+      expect(createFlexUrl(url).filterBy('foo', 'bar').orFilterBy('foo', 'test').getFiltersAsObject()).to.be.deep.eq({ foo: ['bar', 'test'] });
+    });
+  });
 
   describe('#clearFilters', () => {
     it('url with filters removing all of them', () => {
-      expect(createFlexUrl(url).filterBy('foo', 'bar').filterBy('bar', 'test').clearFilters().getQuery()).to.be.empty;
+      expect(createFlexUrl(url).query('foo[test]', 'bar').filterBy('foo', 'bar').filterBy('bar', 'test').clearFilters().getQuery()).to.be.eq('?foo%5Btest%5D=bar');
     });
     
     it('url with filters removing all of them except one', () => {

@@ -12,16 +12,13 @@ export function createFlexUrl(url: string | Record<string, unknown>): FlexUrl {
     return new FlexUrl(strigifiedUrl);
   }
 
-  let matchedPathFragments: Array<string> = []
-
   if (matchedFragments[1]) {
-    matchedPathFragments = matchedFragments[1].split('?')
-  }
+    const pathArr = matchedFragments[1].split('?');
+    const urlWithPathAndQuerySearch = pathArr.length > 1;
 
-  if (matchedPathFragments.length > 1 && matchedPathFragments[1]) {
     return new FlexUrl(
-      matchedFragments[0].replace(`?${matchedPathFragments[1]}`, ''),
-      querystring.decode(matchedPathFragments[1])
+      matchedFragments[0].replace('?' + (urlWithPathAndQuerySearch ? pathArr[1] : matchedFragments[1]), ''),
+      urlWithPathAndQuerySearch ? querystring.decode(pathArr[1]) : {}
     );
   }
 
@@ -130,17 +127,46 @@ export class FlexUrl {
     return this.hasQuery(`filter[${key}]`, value);
   }
 
-  getFilters() {
+  getFilters(asObject = false): Record<string, string | Array<string>> | Array<string> {
+    if (asObject) {
+      return this.getFiltersAsObject();
+    }
+
     let filterAttrs: Array<string> = []
     let cursor: string | undefined 
     const paramsKeysArr = Object.keys(this.params)
 
     while (cursor = paramsKeysArr.pop()) {
-      let paramFragments = cursor.split('[')[1];
+      let paramFragments = cursor.split('filter[')[1];
 
       if (paramFragments) {
         filterAttrs.push(paramFragments.split(']')[0])
       }
+    }
+
+    return filterAttrs;
+  }
+
+  getFiltersAsObject(): Record<string, string | Array<string>> {
+    let filterAttrs: Record<string, string | Array<string>> = {}
+    let cursor: string | undefined
+    const paramsKeysArr = Object.keys(this.params)
+
+    while (cursor = paramsKeysArr.pop()) {
+      let paramFragments = cursor.split('filter[')[1];
+      let paramValue = this.params[cursor];
+
+      if (!paramFragments || paramFragments.length === 0) {
+        continue;
+      }
+
+      if (typeof paramValue === 'string') {
+        const paramValueAsArr = paramValue.split(',');
+
+        paramValue = paramValueAsArr.length > 1 ? paramValueAsArr : paramValue;
+      }
+
+      filterAttrs[paramFragments.split(']')[0]] = paramValue as string | Array<string>;
     }
 
     return filterAttrs;

@@ -11,6 +11,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/chai": "^4.2.22",
+    "@types/faker": "^5.5.9",
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.11.10",
     "@types/url-parse": "^1.4.5",
@@ -31,7 +32,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "bundle": "microbundle -f es,cjs,umd",
-    "watch": "microbundle --watch",
+    "watch": "yarn run bundle watch",
     "clean": "rimraf dist",
     "build": "npm-run-all --silent clean -p bundle",
     "prepublish": "yarn run build",

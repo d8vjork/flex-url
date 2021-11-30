@@ -136,6 +136,22 @@ describe('FlexUrl', () => {
     });
   });
 
+  describe('#removeFilters', () => {
+    it('url with filters removing by key', () => {
+      const flexUrl = createFlexUrl(url).query('foo[test]', 'bar').filterBy('foo', 'bar').filterBy('bar', 'test');
+
+      expect(flexUrl.removeFilter('bar').getFilters()).to.contain('foo');
+      expect(flexUrl.removeFilter('bar').getQuery()).to.be.eq(encodeURI('?foo[test]=bar&filter[foo]=bar'));
+    });
+    
+    it('url with filters removing by key and value on an OR filter', () => {
+      const flexUrl = createFlexUrl(url).query('foo[test]', 'bar').filterBy('foo', 'bar').orFilterBy('foo', 'test');
+
+      expect(flexUrl.removeFilter('foo', 'test').getFiltersAsObject()).to.be.deep.eq({ foo: 'bar' });
+      expect(flexUrl.removeFilter('foo', 'test').getQuery()).to.be.eq(encodeURI('?foo[test]=bar&filter[foo]=bar'));
+    });
+  });
+
   describe('#clearFilters', () => {
     it('url with filters removing all of them', () => {
       expect(createFlexUrl(url).query('foo[test]', 'bar').filterBy('foo', 'bar').filterBy('bar', 'test').clearFilters().getQuery()).to.be.eq('?foo%5Btest%5D=bar');
@@ -144,5 +160,5 @@ describe('FlexUrl', () => {
     it('url with filters removing all of them except one', () => {
       expect(createFlexUrl(url).filterBy('foo', 'bar').filterBy('bar', 'test').clearFilters(['foo']).getQuery()).to.be.eq(encodeURI('?filter[foo]=bar'));
     });
-  })
+  });
 });

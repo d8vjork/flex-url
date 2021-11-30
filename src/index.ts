@@ -172,6 +172,22 @@ export class FlexUrl {
     return filterAttrs;
   }
 
+  removeFilter(key: string, value = ''): this {
+    const keyAsQueryParam = `filter[${key}]`;
+    const filterValue = this.params[keyAsQueryParam] as string || '';
+    let filterValueAsArr = filterValue.split(',');
+
+    if (value && filterValueAsArr.length > 0) {
+      const valueIndexInFilter = filterValueAsArr.indexOf(value);
+      
+      valueIndexInFilter === -1 ? null : filterValueAsArr.splice(filterValueAsArr.indexOf(value), 1);
+
+      return this.filterBy(key, filterValueAsArr.join(','));
+    }
+
+    return this.removeQuery(keyAsQueryParam);
+  }
+
   clearFilters(except: Array<string> = []): this {
     return this.removeQuery(function (param) {
       const filterParamFragments = param.split('[');

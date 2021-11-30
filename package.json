@@ -1,7 +1,7 @@
 {
   "name": "flex-url",
   "description": "Zero-dependency utility for parsing and modifying URL params",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "module": "dist/index.mjs",
   "main": "dist/index.js",
   "jsnext:main": "dist/index.mjs",

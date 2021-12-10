@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2020-12-10
+
+### Added
+
+- ESLint + Prettier as part of the development
+- `hasSort` method to check if the attribute is sorted
+
+### Fixed
+
+- `sortBy`, `sortByDesc`, `sortByAsc` method now toggles properly removing sorts by same attribute (doesn't create duplicates)
+
 ## [0.6.0] - 2020-11-30
 
 ### Added

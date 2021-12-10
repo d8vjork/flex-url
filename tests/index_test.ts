@@ -82,6 +82,10 @@ describe('FlexUrl', () => {
       // expect(createFlexUrl(url).addQuery('foo').addQuery('foo', 'bar').hasQuery('foo', 'bar')).to.be.true;
     });
     
+    it('url with sorted foo as asc adding the same attribute using sortByAsc does not duplicate attribute', () => {
+      expect(createFlexUrl(url + '?sort=foo').sortByAsc('foo').getSortsAsArray()).to.have.lengthOf(1);
+    });
+
     it('url adding a sort using sortBy does add as ascendant', () => {
       expect(createFlexUrl(url).sortBy('foo').getSortsAsArray()).to.contain('foo');
     });

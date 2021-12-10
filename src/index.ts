@@ -1,13 +1,13 @@
-import * as querystring from "./qss"
+import * as querystring from './qss';
 
 export type SortDirection = 'asc' | 'desc';
 
-const regex = /(?:https?:\/\/)?(?:[^?\/\s]+[?\/])(.*)/;
+const regex = /(?:https?:\/\/)?(?:[^?/\s]+[?/])(.*)/;
 
 export function createFlexUrl(url: string | Record<string, unknown>): FlexUrl {
-  const strigifiedUrl = typeof url === "string" ? url : url.toString();
+  const strigifiedUrl = typeof url === 'string' ? url : url.toString();
   const matchedFragments = regex.exec(strigifiedUrl);
-  
+
   if (matchedFragments === null) {
     return new FlexUrl(strigifiedUrl);
   }
@@ -17,8 +17,8 @@ export function createFlexUrl(url: string | Record<string, unknown>): FlexUrl {
     const urlWithPathAndQuerySearch = pathArr.length > 1;
 
     return new FlexUrl(
-      matchedFragments[0].replace('?' + (urlWithPathAndQuerySearch ? pathArr[1] : matchedFragments[1]), ''),
-      urlWithPathAndQuerySearch ? querystring.decode(pathArr[1]) : {}
+      matchedFragments[0].replace(`?${urlWithPathAndQuerySearch ? pathArr[1] : matchedFragments[1]}`, ''),
+      urlWithPathAndQuerySearch ? querystring.decode(pathArr[1]) : {},
     );
   }
 
@@ -69,8 +69,9 @@ export class FlexUrl {
     return this;
   }
 
+  // eslint-disable-next-line no-unused-vars
   removeQuery(key: ((params: string) => boolean) | string, value = ''): this {
-    if (typeof key === "function") {
+    if (typeof key === 'function') {
       let cursor: string | undefined;
       const paramsKeysArr = Object.keys(this.params);
 
@@ -80,15 +81,15 @@ export class FlexUrl {
 
       return this;
     }
-    
+
     if (!this.params[key]) {
       return this;
     }
 
-    if (value && typeof this.params[key] === "object") {
+    if (value && typeof this.params[key] === 'object') {
       (this.params[key] as Array<string>).splice(
         (this.params[key] as Array<string>).indexOf(value),
-        1
+        1,
       );
     } else {
       delete this.params[key];
@@ -115,7 +116,7 @@ export class FlexUrl {
         ? previousFilterValue.split(',')
         : previousFilterValue).concat(filterValuesArr);
     }
-    
+
     return this.setQuery(filterQueryKey, filterValuesArr.join(','));
   }
 
@@ -132,15 +133,15 @@ export class FlexUrl {
       return this.getFiltersAsObject();
     }
 
-    let filterAttrs: Array<string> = []
-    let cursor: string | undefined 
-    const paramsKeysArr = Object.keys(this.params)
+    const filterAttrs: Array<string> = [];
+    let cursor: string | undefined;
+    const paramsKeysArr = Object.keys(this.params);
 
     while (cursor = paramsKeysArr.pop()) {
-      let paramFragments = cursor.split('filter[')[1];
+      const paramFragments = cursor.split('filter[')[1];
 
       if (paramFragments) {
-        filterAttrs.push(paramFragments.split(']')[0])
+        filterAttrs.push(paramFragments.split(']')[0]);
       }
     }
 
@@ -148,12 +149,12 @@ export class FlexUrl {
   }
 
   getFiltersAsObject(): Record<string, string | Array<string>> {
-    let filterAttrs: Record<string, string | Array<string>> = {}
-    let cursor: string | undefined
-    const paramsKeysArr = Object.keys(this.params)
+    const filterAttrs: Record<string, string | Array<string>> = {};
+    let cursor: string | undefined;
+    const paramsKeysArr = Object.keys(this.params);
 
     while (cursor = paramsKeysArr.pop()) {
-      let paramFragments = cursor.split('filter[')[1];
+      const paramFragments = cursor.split('filter[')[1];
       let paramValue = this.params[cursor];
 
       if (!paramFragments || paramFragments.length === 0) {
@@ -175,11 +176,11 @@ export class FlexUrl {
   removeFilter(key: string, value = ''): this {
     const keyAsQueryParam = `filter[${key}]`;
     const filterValue = this.params[keyAsQueryParam] as string || '';
-    let filterValueAsArr = filterValue.split(',');
+    const filterValueAsArr = filterValue.split(',');
 
     if (value && filterValueAsArr.length > 0) {
       const valueIndexInFilter = filterValueAsArr.indexOf(value);
-      
+
       valueIndexInFilter === -1 ? null : filterValueAsArr.splice(filterValueAsArr.indexOf(value), 1);
 
       return this.filterBy(key, filterValueAsArr.join(','));
@@ -189,7 +190,7 @@ export class FlexUrl {
   }
 
   clearFilters(except: Array<string> = []): this {
-    return this.removeQuery(function (param) {
+    return this.removeQuery((param) => {
       const filterParamFragments = param.split('[');
       let condition = filterParamFragments[0] === 'filter';
 
@@ -201,11 +202,13 @@ export class FlexUrl {
     });
   }
 
+  // eslint-disable-next-line no-unused-vars
   getSorts<B extends boolean>(asObject: B): B extends true ? Record<string, SortDirection> : Array<string>;
+  // eslint-disable-next-line no-dupe-class-members
   getSorts(asObject: boolean) {
     let sortQueryParam: Array<string> | string = this.getQuery('sort') as string;
 
-    if (! sortQueryParam) {
+    if (!sortQueryParam) {
       return asObject ? {} : [];
     }
 
@@ -213,7 +216,7 @@ export class FlexUrl {
 
     if (asObject) {
       let cursor: string | undefined;
-      let sortQueryParamObj: Record<string, SortDirection> = {};
+      const sortQueryParamObj: Record<string, SortDirection> = {};
 
       while (cursor = sortQueryParam.pop()) {
         const isDesc = cursor.indexOf('-') === 0;
@@ -231,7 +234,7 @@ export class FlexUrl {
   getSortsAsArray() {
     return this.getSorts(false);
   }
-  
+
   getSortsAsObject() {
     return this.getSorts(true);
   }
@@ -252,18 +255,18 @@ export class FlexUrl {
     return this.setQuery(
       'sort',
       currentSortsArr
-        .filter(sort => [sanitizedValue, `-${sanitizedValue}`].indexOf(sort) === -1)
+        .filter((sort) => [sanitizedValue, `-${sanitizedValue}`].indexOf(sort) === -1)
         .concat([sortValue])
-        .join(',')
+        .join(','),
     );
   }
 
   sortByDesc(value: string): this {
-    return this.sortBy(value, 'desc')
+    return this.sortBy(value, 'desc');
   }
-  
+
   sortByAsc(value: string): this {
-    return this.sortBy(value, 'asc')
+    return this.sortBy(value, 'asc');
   }
 
   clearSorts(): this {

@@ -161,4 +161,11 @@ describe('FlexUrl', () => {
       expect(createFlexUrl(url).filterBy('foo', 'bar').filterBy('bar', 'test').clearFilters(['foo']).getQuery()).to.be.eq(encodeURI('?filter[foo]=bar'));
     });
   });
+  
+  describe('#hasSort', () => {
+    it('url with filters removing all of them', () => {
+      expect(createFlexUrl(url).sortByDesc('bar').hasSort('bar')).to.be.true;
+      expect(createFlexUrl(url).sortBy('bar').sortBy('fo').hasSort('foo')).to.be.false;
+    });
+  });
 });

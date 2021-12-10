@@ -236,18 +236,26 @@ export class FlexUrl {
     return this.getSorts(true);
   }
 
+  hasSort(value: string) {
+    return this.getQuery('sort')?.indexOf(value) !== -1;
+  }
+
   sortBy(value: string, direction: SortDirection | null = null): this {
-    let currentSortsArr = this.getSortsAsArray();
-    let sortValue = (direction === 'desc' ? '-' : '') + value;
-    const currentSortIndex = currentSortsArr.indexOf(sortValue);
+    const sanitizedValue = value.charAt(1) === '-' ? value.slice(1) : value;
+    const currentSortsArr = this.getSortsAsArray();
+    let sortValue = (direction === 'desc' ? '-' : '') + sanitizedValue;
 
-    if (direction === null && currentSortIndex !== -1) {
-      currentSortsArr.splice(currentSortIndex, 1);
-
-      sortValue = sortValue.charAt(1) === '-' ? value : `-${value}`;
+    if (direction === null && currentSortsArr.indexOf(sanitizedValue) !== -1) {
+      sortValue = sortValue.charAt(1) === '-' ? sanitizedValue : `-${sanitizedValue}`;
     }
 
-    return this.setQuery('sort', currentSortsArr.concat([sortValue]).join(','));
+    return this.setQuery(
+      'sort',
+      currentSortsArr
+        .filter(sort => [sanitizedValue, `-${sanitizedValue}`].indexOf(sort) === -1)
+        .concat([sortValue])
+        .join(',')
+    );
   }
 
   sortByDesc(value: string): this {

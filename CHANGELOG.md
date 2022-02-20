@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.7.0] - 2020-12-10
+## [0.7.0] - 2021-12-10
 
 ### Added
 
@@ -18,13 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `sortBy`, `sortByDesc`, `sortByAsc` method now toggles properly removing sorts by same attribute (doesn't create duplicates)
 
-## [0.6.0] - 2020-11-30
+## [0.6.0] - 2021-11-30
 
 ### Added
 
 - `removeFilter` method that removes a filter by key or value (on OR filters will remove only the value)
 
-## [0.5.0] - 2020-11-30
+## [0.5.0] - 2021-11-30
 
 ### Added
 
@@ -34,25 +34,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Regression: Query params parser in browser not getting strings from params
 
-## [0.4.3] - 2020-11-29
+## [0.4.3] - 2021-11-29
 
 ### Fixed
 
 - Query params parser in browser not getting strings from params
 
-## [0.4.2] - 2020-11-26
+## [0.4.2] - 2021-11-26
 
 ### Changed
 
 - `filterBy` with same key should replace filter value unless sent as OR
 
-## [0.4.1] - 2020-11-26
+## [0.4.1] - 2021-11-26
 
 ### Fixed
 
 - Fixed `createFlexUrl` failing to parse with some URLs
 
-## [0.4.0] - 2020-11-26
+## [0.4.0] - 2021-11-26
 
 ### Changed
 
@@ -62,13 +62,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `orFilterBy()` same as the one in `filterBy` (alias)
 
-## [0.3.0] - 2020-11-26
+## [0.3.0] - 2021-11-26
 
 ### Added
 
 - Method `getFilters()` for get an array of attributes filtered
 
-## [0.2.0] - 2020-11-26
+## [0.2.0] - 2021-11-26
 
 ### Changed
 
@@ -80,13 +80,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Method `clearSorts()` for remove all sorts
 - Method `clearFilters(except = [])` for remove all or some filter query parameters
 
-## [0.1.1] - 2020-11-25
+## [0.1.1] - 2021-11-25
 
 ### Added
 
 - Missing types from NPM publication
 
-## [0.1.0] - 2020-11-25
+## [0.1.0] - 2021-11-25
 
 ### Added
 

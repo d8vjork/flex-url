@@ -1,6 +1,6 @@
 # FlexUrl
 
-[![CI](https://github.com/d8vjork/flex-url/actions/workflows/main.yml/badge.svg)](https://github.com/d8vjork/flex-url/actions/workflows/main.yml)
+[![Test](https://github.com/d8vjork/flex-url/actions/workflows/tests.yml/badge.svg)](https://github.com/d8vjork/flex-url/actions/workflows/tests.yml)
 
 FlexUrl is a utility with almost zero dependencies that aims simplicity at the time of parsing and modifying a URL on a browser or node based app.
 

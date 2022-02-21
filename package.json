@@ -38,7 +38,7 @@
     "clean": "rimraf dist",
     "build": "npm-run-all --silent clean -p bundle",
     "prepublishOnly": "yarn run build",
-    "test": "mocha && nyc report --reporter=lcov"
+    "test": "nyc --reporter=lcov mocha"
   },
   "files": [
     "dist/*",

@@ -1,0 +1,12 @@
+{
+    "extension": [
+        "ts"
+    ],
+    "require": [
+        "ts-node/register",
+        "esm"
+    ],
+    "spec": [
+        "tests/*_test.ts"
+    ]
+}

@@ -16,10 +16,16 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 12
-      - name: install, build, and test
+      - name: install dependencies and test
         run: |
           yarn install
-          npm run build
-          npm test
+          yarn test
         env:
           CI: true
+      
+      - name: Deploy coverage to codacy
+        uses: codacy/codacy-coverage-reporter-action@v1
+        with:
+          # project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          api-token: ${{ secrets.CODACY_API_TOKEN }}
+          coverage-reports: coverage/lcov.info

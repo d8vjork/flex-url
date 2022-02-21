@@ -1,4 +1,4 @@
-import { createFlexUrl } from '..';
+import { createFlexUrl } from '../src';
 import { expect } from 'chai';
 
 const url = 'http://api.mywebsite.com/'

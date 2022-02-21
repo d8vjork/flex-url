@@ -6,3 +6,5 @@ node_modules
 dist
 types
 test.js
+.nyc_output
+coverage

@@ -8,3 +8,5 @@ types
 test.js
 .nyc_output
 coverage
+.temp
+.cache

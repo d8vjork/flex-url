@@ -29,20 +29,19 @@ function toValue(mix: string | undefined) {
 export function decode(str: string) {
   let cursor;
   let k;
-  const out: Record<string, any> = {};
-  const arr = str.split('&');
+  const pathFragmentsObject: Record<string, any> = {};
+  const pathFragments = str.split('&').map(fragment => decodeURIComponent(fragment));
 
-  while (cursor = arr.pop()) {
+  while (cursor = pathFragments.pop()) {
     cursor = cursor.split('=');
     k = cursor.shift() as string;
-    const outt = out[k];
 
-    if (outt !== void 0) {
-      out[k] = ([] as Array<string>).concat(outt, toValue(cursor.shift()) as string);
+    if (pathFragmentsObject[k] !== void 0) {
+      pathFragmentsObject[k] = ([] as Array<string>).concat(pathFragmentsObject[k], toValue(cursor.shift()) as string);
     } else {
-      out[k] = toValue(cursor.shift());
+      pathFragmentsObject[k] = toValue(cursor.shift());
     }
   }
 
-  return out;
+  return pathFragmentsObject;
 }

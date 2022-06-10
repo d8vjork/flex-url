@@ -12,6 +12,12 @@ describe('createFlexUrl', () => {
   it('url parser can handle special characters', () => {
     expect(createFlexUrl('localhost:8000/test').addQuery('foo', '🤙').toString()).to.be.eq(encodeURI('localhost:8000/test?foo=🤙'));
   });
+  
+  it('url parser can handle already encoded urls', () => {
+    const preParsedUrl = createFlexUrl('localhost:8000/test?sort=hello,world,-created_at&filter[hello]=foo').toString()
+
+    expect(createFlexUrl(preParsedUrl).toString()).to.be.eq('localhost:8000/test?'+encodeURIComponent('sort')+'='+encodeURIComponent('hello,world,-created_at')+'&'+encodeURIComponent('filter[hello]')+'='+encodeURIComponent('foo'));
+  });
 });
 
 describe('FlexUrl', () => {

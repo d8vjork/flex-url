@@ -1,0 +1,1 @@
+const e={key:"v-fffb8e28",path:"/guide/",title:"Introduction",lang:"en-US",frontmatter:{},excerpt:"",headers:[{level:2,title:"Getting started",slug:"getting-started",children:[{level:3,title:"Browser",slug:"browser",children:[]},{level:3,title:"NodeJS",slug:"nodejs",children:[]}]}]};export{e as data};

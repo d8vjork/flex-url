@@ -8,7 +8,7 @@ FlexUrl is a utility with almost zero dependencies that aims simplicity at the t
 
 ## Documentation
 
-[Check the official documentation here](https://flex-url.opensoutheners.com).
+[Check the official documentation here](https://docs.opensoutheners.com/flex-url).
 
 ## Benchmarks
 

@@ -115,9 +115,11 @@ export class FlexUrl {
       filterValuesArr = (typeof previousFilterValue === 'string'
         ? previousFilterValue.split(',')
         : previousFilterValue).concat(filterValuesArr);
+
+      return this.setQuery(filterQueryKey, filterValuesArr.join(','))
     }
 
-    return this.setQuery(filterQueryKey, filterValuesArr.join(','));
+    return this.addQuery(filterQueryKey, filterValuesArr.join(','));
   }
 
   orFilterBy(key: string, value: string): this {
@@ -154,6 +156,10 @@ export class FlexUrl {
     const paramsKeysArr = Object.keys(this.params);
 
     while (cursor = paramsKeysArr.pop()) {
+      if (!cursor.includes('filter[')) {
+        continue;
+      }
+
       const paramFragments = cursor.split('filter[')[1];
       let paramValue = this.params[cursor];
 
@@ -178,12 +184,12 @@ export class FlexUrl {
     const filterValue = this.params[keyAsQueryParam] as string || '';
     const filterValueAsArr = filterValue.split(',');
 
-    if (value && filterValueAsArr.length > 0) {
+    if (value && filterValueAsArr.length > 0 && value !== filterValue) {
       const valueIndexInFilter = filterValueAsArr.indexOf(value);
 
       valueIndexInFilter === -1 ? null : filterValueAsArr.splice(filterValueAsArr.indexOf(value), 1);
 
-      return this.filterBy(key, filterValueAsArr.join(','));
+      return this.setQuery(keyAsQueryParam, filterValueAsArr.join(','));
     }
 
     return this.removeQuery(keyAsQueryParam);

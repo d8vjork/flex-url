@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.3] - 2022-11-03
+
+### Fixed
+
+- Removing filters that aren't present on the URL was adding them instead
+
 ## [0.7.2] - 2022-10-31
 
 ### Fixed

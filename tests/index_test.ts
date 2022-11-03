@@ -160,6 +160,13 @@ describe('FlexUrl', () => {
       expect(flexUrl.removeFilter('foo', 'test').getFiltersAsObject()).to.be.deep.eq({ foo: 'bar' });
       expect(flexUrl.removeFilter('foo', 'test').getQuery()).to.be.eq(encodeURI('?foo[test]=bar&filter[foo]=bar'));
     });
+
+    it('url removing filter by unexisting key returns same url', () => {
+      const flexUrl = createFlexUrl(url).filterBy('foo', 'bar').orFilterBy('foo', 'test');
+
+      expect(flexUrl.removeFilter('test', 'hello').getFiltersAsObject()).to.be.deep.eq({ foo: ['bar', 'test'] });
+      expect(flexUrl.removeFilter('test', 'hello').getQuery()).to.be.eq('?'+encodeURIComponent('filter[foo]')+'='+encodeURIComponent('bar,test'));
+    });
   });
 
   describe('#clearFilters', () => {

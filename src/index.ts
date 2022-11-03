@@ -184,6 +184,10 @@ export class FlexUrl {
     const filterValue = this.params[keyAsQueryParam] as string || '';
     const filterValueAsArr = filterValue.split(',');
 
+    if (!(keyAsQueryParam in this.params)) {
+      return this;
+    }
+
     if (value && filterValueAsArr.length > 0 && value !== filterValue) {
       const valueIndexInFilter = filterValueAsArr.indexOf(value);
 

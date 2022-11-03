@@ -181,8 +181,8 @@ export class FlexUrl {
 
   removeFilter(key: string, value = ''): this {
     const keyAsQueryParam = `filter[${key}]`;
-    const filterValue = this.params[keyAsQueryParam] as string || '';
-    const filterValueAsArr = filterValue.split(',');
+    const filterValue = this.params[keyAsQueryParam] || '';
+    const filterValueAsArr = typeof filterValue === 'string' ? filterValue.split(',') : filterValue;
 
     if (!(keyAsQueryParam in this.params)) {
       return this;

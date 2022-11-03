@@ -167,6 +167,13 @@ describe('FlexUrl', () => {
       expect(flexUrl.removeFilter('test', 'hello').getFiltersAsObject()).to.be.deep.eq({ foo: ['bar', 'test'] });
       expect(flexUrl.removeFilter('test', 'hello').getQuery()).to.be.eq('?'+encodeURIComponent('filter[foo]')+'='+encodeURIComponent('bar,test'));
     });
+    
+    it('url with AND filters removing filter by key and value returns url with the other filter', () => {
+      const flexUrl = createFlexUrl(url).filterBy('foo', 'bar').filterBy('foo', 'test');
+
+      expect(flexUrl.removeFilter('foo', 'bar').getFiltersAsObject()).to.be.deep.eq({ foo: 'test' });
+      expect(flexUrl.removeFilter('foo', 'bar').getQuery()).to.be.eq(encodeURI('?filter[foo]=test'));
+    });
   });
 
   describe('#clearFilters', () => {

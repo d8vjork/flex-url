@@ -146,6 +146,20 @@ describe('FlexUrl', () => {
     });
   });
 
+  describe('#replaceFilter', () => {
+    it('url with AND filters replacing filter by key and value returns url with new value replaced', () => {
+      const flexUrl = createFlexUrl(url).filterBy('foo', 'bar').filterBy('foo', 'test');
+
+      expect(flexUrl.replaceFilter('foo', 'test', 'hello').getFiltersAsObject()).to.be.deep.eq({ foo: ['bar', 'hello'] });
+    });
+    
+    it('url without AND filters replacing filter by key and value returns url with new value replaced as string', () => {
+      const flexUrl = createFlexUrl(url).filterBy('foo', 'bar');
+
+      expect(flexUrl.replaceFilter('foo', 'hello').getFiltersAsObject()).to.be.deep.eq({ foo: 'hello' });
+    });
+  });
+
   describe('#removeFilters', () => {
     it('url with filters removing by key', () => {
       const flexUrl = createFlexUrl(url).query('foo[test]', 'bar').filterBy('foo', 'bar').filterBy('bar', 'test');
@@ -173,18 +187,6 @@ describe('FlexUrl', () => {
 
       expect(flexUrl.removeFilter('foo', 'bar').getFiltersAsObject()).to.be.deep.eq({ foo: 'test' });
       expect(flexUrl.removeFilter('foo', 'bar').getQuery()).to.be.eq(encodeURI('?filter[foo]=test'));
-    });
-
-    it('url with AND filters replacing filter by key and value returns url with new value replaced', () => {
-      const flexUrl = createFlexUrl(url).filterBy('foo', 'bar').filterBy('foo', 'test');
-
-      expect(flexUrl.replaceFilter('foo', 'test', 'hello').getFiltersAsObject()).to.be.deep.eq({ foo: ['bar', 'hello'] });
-    });
-    
-    it('url without AND filters replacing filter by key and value returns url with new value replaced as string', () => {
-      const flexUrl = createFlexUrl(url).filterBy('foo', 'bar');
-
-      expect(flexUrl.replaceFilter('foo', 'hello').getFiltersAsObject()).to.be.deep.eq({ foo: 'hello' });
     });
   });
 

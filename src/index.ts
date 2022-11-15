@@ -179,6 +179,33 @@ export class FlexUrl {
     return filterAttrs;
   }
 
+  replaceFilter(key: string, oldValue: string, newValue?: string): this {
+    const keyAsQueryParam = `filter[${key}]`;
+    let filterValues = this.params[keyAsQueryParam] || '';
+
+    if (typeof filterValues === 'object' && newValue) {
+      const oldValueIndex = filterValues.findIndex((value) => value === oldValue);
+      
+      if (oldValueIndex !== -1) {
+        filterValues[oldValueIndex] = newValue;
+      } else {
+        filterValues.push(newValue);
+      }
+    }
+
+    if (typeof filterValues === 'string' && newValue) {
+      filterValues = newValue;
+    }
+
+    if (typeof filterValues === 'string' && !newValue) {
+      filterValues = oldValue;
+    }
+
+    this.params[keyAsQueryParam] = filterValues;
+
+    return this
+  }
+
   removeFilter(key: string, value = ''): this {
     const keyAsQueryParam = `filter[${key}]`;
     const filterValue = this.params[keyAsQueryParam] || '';

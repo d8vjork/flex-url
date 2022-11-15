@@ -183,11 +183,15 @@ export class FlexUrl {
     return filterAttrs;
   }
 
-  replaceFilter(key: string, oldValue: string, newValue?: string): this {
+  replaceFilter(key: string, oldValue: string, newValue?: string, replaceAll?: boolean): this {
     const keyAsQueryParam = `filter[${key}]`;
     let filterValues = this.params[keyAsQueryParam] || '';
 
-    if (typeof filterValues === 'object' && newValue) {
+    if (replaceAll) {
+      filterValues = newValue || oldValue;
+    }
+
+    if (!replaceAll && typeof filterValues === 'object' && newValue) {
       const oldValueIndex = filterValues.findIndex((value) => value === oldValue);
       
       if (oldValueIndex !== -1) {
@@ -195,17 +199,21 @@ export class FlexUrl {
       }
     }
 
-    if (typeof filterValues === 'string' && newValue) {
+    if (!replaceAll && typeof filterValues === 'string' && newValue) {
       filterValues = newValue;
     }
 
-    if (typeof filterValues === 'string' && !newValue) {
+    if (!replaceAll && typeof filterValues === 'string' && !newValue) {
       filterValues = oldValue;
     }
 
     this.params[keyAsQueryParam] = filterValues;
 
     return this
+  }
+
+  replaceAllFilters(key: string, value: string): this {
+    return this.replaceFilter(key, value, undefined, true);
   }
 
   removeFilter(key: string, value = ''): this {

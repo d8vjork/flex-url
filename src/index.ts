@@ -119,6 +119,10 @@ export class FlexUrl {
       return this.setQuery(filterQueryKey, filterValuesArr.join(','))
     }
 
+    if (this.hasFilter(key, value)) {
+      return this;
+    }
+
     return this.addQuery(filterQueryKey, filterValuesArr.join(','));
   }
 

@@ -66,7 +66,7 @@ describe('FlexUrl', () => {
       const flexUrl = createFlexUrl(url).addQuery('foo', 'bar').addQuery('foo', 'test').removeQuery('foo');
 
       expect(flexUrl.getQuery()).to.be.empty;
-      expect(flexUrl.toString()).to.be.eq(url);
+      expect(flexUrl.toString()).to.be.deep.eq(url);
     });
 
 
@@ -130,6 +130,12 @@ describe('FlexUrl', () => {
       const parsedUrl = createFlexUrl(url).filterBy('foo', '1').toString();
 
       expect(createFlexUrl(parsedUrl).orFilterBy('foo', '2')).to.be.ok;
+    });
+    
+    it('adding AND filters', () => {
+      const flexUrl = createFlexUrl(url).filterBy('foo', '1', true);
+
+      expect(flexUrl.filterBy('foo', '1', true).getFiltersAsObject()).to.be.deep.eq({ foo: '1' });
     });
   })
 

@@ -9,9 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.8.0] - 2022-11-15
 
+### Fixed
+
+- Prevent adding more AND filters when name and value are same as one of the presents
+
 ### Added
 
-- Replacing filters with values method `replaceFilter(name, oldValue, newValue)` (useful when using multiple AND filters with same attribute)
+- Replacing filters with values method `replaceFilter(key, oldValue, newValue)` (useful when using multiple AND filters with same name)
+- Replace all filters with specified value method `replaceAllFilters(key, value)`
 
 ## [0.7.4] - 2022-11-03
 

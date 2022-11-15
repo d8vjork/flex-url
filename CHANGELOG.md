@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2022-11-15
+
+### Added
+
+- Replacing filters with values method `replaceFilter(name, oldValue, newValue)` (useful when using multiple AND filters with same attribute)
+
 ## [0.7.4] - 2022-11-03
 
 ### Fixed

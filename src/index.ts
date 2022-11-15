@@ -188,8 +188,6 @@ export class FlexUrl {
       
       if (oldValueIndex !== -1) {
         filterValues[oldValueIndex] = newValue;
-      } else {
-        filterValues.push(newValue);
       }
     }
 

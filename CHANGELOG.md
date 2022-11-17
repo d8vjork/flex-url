@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Support to ESM 
+
+### Changed
+
+- **Full refactor! All methods has been replaced to a more clear API**
+
 ## [0.8.0] - 2022-11-15
 
 ### Fixed

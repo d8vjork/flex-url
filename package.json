@@ -35,6 +35,9 @@
     "ts-node": "^10.4.0",
     "typescript": "^4.9.3"
   },
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "scripts": {
     "typecheck": "tsc --noEmit",
     "bundle": "microbundle -f es,cjs,umd",

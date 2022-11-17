@@ -1,12 +1,10 @@
 {
+    "$schema": "https://json.schemastore.org/mocharc",
+    "loader": "ts-node/esm",
     "extension": [
         "ts"
     ],
-    "require": [
-        "ts-node/register",
-        "esm"
-    ],
     "spec": [
-        "tests/*_test.ts"
+        "tests"
     ]
 }

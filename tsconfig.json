@@ -1,12 +1,11 @@
 {
     "compileOnSave": false,
     "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
         "strict": true,
-        "noEmit": true,
-        "allowJs": true,
         "declaration": true,
         "moduleResolution": "node",
-        "esModuleInterop": true,
         "types": [
             "mocha",
             "chai"

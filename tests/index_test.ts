@@ -1,224 +1,185 @@
-import { createFlexUrl } from '../src';
-import { expect } from 'chai';
+import { flexUrl } from '../src/index.js';
+import { assert, expect } from 'chai';
 
-const url = 'http://api.mywebsite.com/'
+const baseUrl = 'http://api.mywebsite.com'
 
-describe('createFlexUrl', () => {
-  it('url parsed and going back to string properly', () => {
-    expect(createFlexUrl(url).toString()).to.be.eq(url);
-    expect(createFlexUrl('localhost:8000/test').toString()).to.be.eq('localhost:8000/test');
-  });
-
-  it('url parser can handle special characters', () => {
-    expect(createFlexUrl('localhost:8000/test').addQuery('foo', '🤙').toString()).to.be.eq(encodeURI('localhost:8000/test?foo=🤙'));
-  });
-
-  it('url parser can handle already encoded urls', () => {
-    const preParsedUrl = createFlexUrl('localhost:8000/test?sort=hello,world,-created_at&filter[hello]=foo').toString()
-
-    expect(createFlexUrl(preParsedUrl).toString()).to.be.eq('localhost:8000/test?' + encodeURIComponent('sort') + '=' + encodeURIComponent('hello,world,-created_at') + '&' + encodeURIComponent('filter[hello]') + '=' + encodeURIComponent('foo'));
-  });
-});
-
-describe('FlexUrl', () => {
-  describe('#hasQuery', () => {
-    it('url with "?foo=" query param has query param with key', () => {
-      expect(createFlexUrl(url + '?foo=').hasQuery('foo')).to.be.true;
-      expect(createFlexUrl(url + '?foo=').hasQuery('bar')).to.be.false;
-    });
-
-    it('url with "?foo=bar" query param has query param with key & value', () => {
-      expect(createFlexUrl(url + '?foo=bar').hasQuery('foo', 'bar')).to.be.true;
-      expect(createFlexUrl(url + '?foo=bar').hasQuery('foo', 'test')).to.be.false;
-    });
+describe('URL Parsing', () => {
+  it('Passing URL without query should not get any', () => {
+    expect(flexUrl(baseUrl).params).to.be.empty
   })
 
-  describe('#hasQuery', () => {
-    it('url with "?foo=" query param has query param with key', () => {
-      expect(createFlexUrl(url + '?foo=').hasQuery('foo')).to.be.true;
-      expect(createFlexUrl(url + '?foo=').hasQuery('bar')).to.be.false;
-    });
+  it('Passing URL with query should get all as a params array', () => {
+    const url = flexUrl(`${baseUrl}?filter[hello]=world&foo=bar`)
 
-    it('url with "?foo=bar" query param has query param with key & value', () => {
-      expect(createFlexUrl(url + '?foo=bar').hasQuery('foo', 'bar')).to.be.true;
-      expect(createFlexUrl(url + '?foo=bar').hasQuery('foo', 'test')).to.be.false;
-    });
+    expect(url.params).to.not.be.empty
+    expect(url.params).to.be.lengthOf(2)
   })
 
-  describe('#setQuery', () => {
-    it('url without query params setting two params', () => {
-      expect(createFlexUrl(url).query('foo').query('foo', 'bar').hasQuery('foo', 'bar')).to.be.true;
-      expect(createFlexUrl(url).setQuery('foo').setQuery('foo', 'bar').toString()).to.be.eq(url + '?foo=bar');
-      expect(createFlexUrl(url).setQuery('bar', 'foo').setQuery('bar').hasQuery('foo')).to.be.false;
-    });
+  it('Passing URL with query should serialise with URL encoding', () => {
+    const url = flexUrl(`${baseUrl}?filter[hello]=test,world&filter[user.name][equal same]=Rubén Robles&foo=bar`)
+
+    expect(url.toString()).to.be.eq(`${baseUrl}?filter[hello]=test%2Cworld&filter[user.name][equal%20same]=Rub%C3%A9n%20Robles&foo=bar`)
   })
 
-  describe('#addQuery', () => {
-    it('url without query params adding two params', () => {
-      expect(createFlexUrl(url).query('foo', '', 'add').query('foo', 'bar', 'add').hasQuery('foo')).to.be.true;
-      expect(createFlexUrl(url).addQuery('foo').addQuery('foo', 'bar').toString()).to.be.eq(url + '?foo=&foo=bar');
-      expect(createFlexUrl(url).addQuery('foo').addQuery('foo', 'bar').hasQuery('foo', 'bar')).to.be.true;
-    });
+  it('Passing serialised URL from flexURL to flexURL for parsing should serialise as same (🤯)', () => {
+    const url = flexUrl(`${baseUrl}?filter[hello]=world&foo=bar`)
+    const sameUrl = flexUrl(url.toString())
+
+    expect(url.toString()).to.be.eq(sameUrl.toString())
+  })
+})
+
+describe('Query Parameters Manipulation', () => {
+  it('Set query parameter with empty params returns empty query', () => {
+    const url = flexUrl(baseUrl)
+      
+    url.queryParam('foo').set('bar')
+    url.queryParam('foo').set('hello')
+
+    expect(url.params).to.be.empty
+    expect(url.toString()).to.be.eq(`${baseUrl}`)
   })
 
-  describe('#removeQuery', () => {
-    it('url with query params foo=bar & foo=test removing all foo params', () => {
-      const flexUrl = createFlexUrl(url).addQuery('foo', 'bar').addQuery('foo', 'test').removeQuery('foo');
+  it('Set query parameter replaces param with new value if one is present', () => {
+    const url = flexUrl(baseUrl)
+      
+    url.queryParam('foo').add('bar')
+    url.queryParam('foo').set('hello')
 
-      expect(flexUrl.getQuery()).to.be.empty;
-      expect(flexUrl.toString()).to.be.deep.eq(url);
-    });
-
-
-    it('url with query params foo=bar & foo=test removing foo params with test value', () => {
-      const flexUrl = createFlexUrl(url).addQuery('foo', 'bar').addQuery('foo', 'test').removeQuery('foo', 'test');
-
-      expect(flexUrl.getQuery()).to.be.eq('?foo=bar');
-      expect(flexUrl.toString()).to.be.eq(url + '?foo=bar');
-    });
+    expect(url.params).to.not.be.empty
+    expect(url.params).to.be.lengthOf(1)
+    expect(url.toString()).to.be.eq(`${baseUrl}?foo=hello`)
   })
-
-  describe('#sortBy', () => {
-    it('url without sorts adding a sortBy created-at as descendant', () => {
-      expect(createFlexUrl(url).sortBy('created-at', 'desc').getSorts(false)).to.contain('-created-at');
-      expect(createFlexUrl(url).sortByDesc('created-at').getSorts(true)).to.be.deep.eq({
-        'created-at': 'desc'
-      });
-      expect(createFlexUrl(url).sortByDesc('created-at').toString()).to.be.eq(url + '?sort=-created-at');
-      // expect(createFlexUrl(url).addQuery('foo').addQuery('foo', 'bar').hasQuery('foo', 'bar')).to.be.true;
-    });
-
-    it('url with sorted foo as asc adding the same attribute using sortByAsc does not duplicate attribute', () => {
-      expect(createFlexUrl(url + '?sort=foo').sortByAsc('foo').getSortsAsArray()).to.have.lengthOf(1);
-    });
-
-    it('url adding a sort using sortBy does add as ascendant', () => {
-      expect(createFlexUrl(url).sortBy('foo').getSortsAsArray()).to.contain('foo');
-    });
-
-    it('url adding a sort using sortBy twice twice toggles the sort to descendant', () => {
-      expect(createFlexUrl(url).sortBy('foo').sortBy('foo').getSortsAsArray()).to.contain('-foo');
-    });
-  })
-
-  describe('#clearSorts', () => {
-    it('url with sorts removing all of them', () => {
-      expect(createFlexUrl(url).sortBy('created-at', 'desc').sortBy('test').clearSorts().getSortsAsArray()).to.be.empty;
-    });
-  })
-
-  describe('#filterBy', () => {
-    it('url adding a filter foo=bar', () => {
-      expect(createFlexUrl(url).filterBy('foo', 'bar').hasFilter('foo')).to.be.true;
-      expect(createFlexUrl(url).filterBy('foo', 'bar').toString()).to.be.eq(encodeURI(url + '?filter[foo]=bar'));
-    });
-
-    it('url adding a filter foo=bar and adding another foo=test', () => {
-      expect(createFlexUrl(url).filterBy('foo', 'bar').filterBy('foo', 'test').hasFilter('foo', 'test')).to.be.true;
-      expect(createFlexUrl(url).filterBy('foo', 'bar').filterBy('foo', 'test').toString()).to.be.eq(encodeURI(url + '?filter[foo]=bar&filter[foo]=test'));
-    });
-
-    it('url adding a filter foo=bar and replace with bar OR test', () => {
-      const flexUrl = createFlexUrl(url).filterBy('foo', 'bar').filterBy('foo', 'test', false);
-
-      expect(flexUrl.getFilters()).to.contain('foo');
-      expect(flexUrl.getQuery('filter[foo]')).to.be.eq('bar,test');
-      expect(flexUrl.orFilterBy('foo', 'hello').getQuery('filter[foo]')).to.be.eq('bar,test,hello');
-    });
-
-    it('adding OR filters with integers over a parsed url', () => {
-      const parsedUrl = createFlexUrl(url).filterBy('foo', '1').toString();
-
-      expect(createFlexUrl(parsedUrl).orFilterBy('foo', '2')).to.be.ok;
-    });
-    
-    it('adding AND filters', () => {
-      const flexUrl = createFlexUrl(url).filterBy('foo', '1', true);
-
-      expect(flexUrl.filterBy('foo', '1', true).getFiltersAsObject()).to.be.deep.eq({ foo: '1' });
-    });
-  })
-
-  describe('#getFilters', () => {
-    it('url with filters getting all of the attributes filtered as array', () => {
-      expect(createFlexUrl(url).filterBy('foo', 'bar').filterBy('bar', 'test').getFilters()).to.have.members(['foo', 'bar']);
-    });
-  });
-
-  describe('#getFiltersAsObject', () => {
-    it('url with filters getting all of the attributes filtered as object', () => {
-      expect(createFlexUrl(url).query('foo[test]', 'bar').filterBy('foo', 'bar').filterBy('bar', 'test').getFiltersAsObject()).to.be.deep.eq({ foo: 'bar', bar: 'test' });
-      expect(createFlexUrl(url).filterBy('foo', 'bar').orFilterBy('foo', 'test').getFiltersAsObject()).to.be.deep.eq({ foo: ['bar', 'test'] });
-    });
-  });
-
   
-  describe('#replaceFilter', () => {
-    it('url with AND filters replacing filter by key and value returns url with new value replaced', () => {
-      const flexUrl = createFlexUrl(url).filterBy('foo', 'bar').filterBy('foo', 'test');
+  it('Add query parameter with same key adds new parameter to ones already present', () => {
+    const url = flexUrl(baseUrl)
+      
+    url.queryParam('foo').add('bar')
+    url.queryParam('foo').add('hello')
 
-      expect(flexUrl.replaceFilter('foo', 'test', 'hello').getFiltersAsObject()).to.be.deep.eq({ foo: ['bar', 'hello'] });
-    });
+    expect(url.params).to.not.be.empty
+    expect(url.params).to.be.lengthOf(2)
+    expect(url.toString()).to.be.eq(`${baseUrl}?foo=bar&foo=hello`)
+  })
+
+  it('Add query parameter with same key and value does not add a new one', () => {
+    const url = flexUrl(baseUrl)
+      
+    url.queryParam('foo').add('bar')
+    url.queryParam('foo').add('bar')
+
+    expect(url.params).to.not.be.empty
+    expect(url.params).to.be.lengthOf(1)
+    expect(url.toString()).to.be.eq(`${baseUrl}?foo=bar`)
+  })
+
+  it('Add query parameter with modifiers adds new parameter with all modifiers added', () => {
+    const url = flexUrl(baseUrl)
+      
+    url.queryParam('filter').add('bar', ['foo'])
+    url.queryParam('filter').add('hello', ['foo', 'test'])
+
+    expect(url.params).to.not.be.empty
+    expect(url.params).to.be.lengthOf(2)
+    expect(url.toString()).to.be.eq(`${baseUrl}?filter[foo]=bar&filter[foo][test]=hello`)
+  })
+
+  it('Add query parameter then change its modifiers adds modifiers to the added parameter', () => {
+    const url = flexUrl(baseUrl)
+      
+    url.queryParam('filter').add('bar').withModifiers(['foo', 'test'])
+
+    expect(url.params).to.not.be.empty
+    expect(url.params).to.be.lengthOf(1)
+    expect(url.toString()).to.be.eq(`${baseUrl}?filter[foo][test]=bar`)
+  })
+  
+  it('Toggle query parameter adds new parameter if one not present', () => {
+    const url = flexUrl(baseUrl)
     
-    it('url without AND filters replacing filter by key and value returns url with new value replaced as string', () => {
-      const flexUrl = createFlexUrl(url).filterBy('foo', 'bar');
+    url.queryParam('foo').toggle('bar')
 
-      expect(flexUrl.replaceFilter('foo', 'hello').getFiltersAsObject()).to.be.deep.eq({ foo: 'hello' });
-    });
-  });
+    expect(url.params).to.not.be.empty
+    expect(url.params).to.be.lengthOf(1)
+    expect(url.toString()).to.be.eq(`${baseUrl}?foo=bar`)
+  })
 
-  describe('#replaceAllFilters', () => {
-    it('url with AND filters replacing all filters by key with value returns url with one value on filter key', () => {
-      const flexUrl = createFlexUrl(url).filterBy('foo', 'bar').filterBy('foo', 'test', true).filterBy('foo', 'hello', true);
-
-      expect(flexUrl.replaceAllFilters('foo', 'another').getFiltersAsObject()).to.be.deep.eq({ foo: 'another' });
-    });
-  });
-
-  describe('#removeFilters', () => {
-    it('url with filters removing by key', () => {
-      const flexUrl = createFlexUrl(url).query('foo[test]', 'bar').filterBy('foo', 'bar').filterBy('bar', 'test');
-
-      expect(flexUrl.removeFilter('bar').getFilters()).to.contain('foo');
-      expect(flexUrl.removeFilter('bar').getQuery()).to.be.eq(encodeURI('?foo[test]=bar&filter[foo]=bar'));
-    });
-
-    it('url with filters removing by key and value on an OR filter with previous query', () => {
-      const flexUrl = createFlexUrl(url).query('foo[test]', 'bar').filterBy('foo', 'bar').orFilterBy('foo', 'test');
-
-      expect(flexUrl.removeFilter('foo', 'test').getFiltersAsObject()).to.be.deep.eq({ foo: 'bar' });
-      expect(flexUrl.removeFilter('foo', 'test').getQuery()).to.be.eq(encodeURI('?foo[test]=bar&filter[foo]=bar'));
-    });
-
-    it('url removing filter by unexisting key returns same url', () => {
-      const flexUrl = createFlexUrl(url).filterBy('foo', 'bar').orFilterBy('foo', 'test');
-
-      expect(flexUrl.removeFilter('test', 'hello').getFiltersAsObject()).to.be.deep.eq({ foo: ['bar', 'test'] });
-      expect(flexUrl.removeFilter('test', 'hello').getQuery()).to.be.eq('?'+encodeURIComponent('filter[foo]')+'='+encodeURIComponent('bar,test'));
-    });
+  it('Toggle query parameter removes parameter if one present', () => {
+    const url = flexUrl(baseUrl)
     
-    it('url with AND filters removing filter by key and value returns url with the other filter', () => {
-      const flexUrl = createFlexUrl(url).filterBy('foo', 'bar').filterBy('foo', 'test');
+    url.queryParam('foo').add('bar')
+    url.queryParam('foo').add('hello')
+    url.queryParam('foo').toggle('bar')
 
-      expect(flexUrl.removeFilter('foo', 'bar').getFiltersAsObject()).to.be.deep.eq({ foo: 'test' });
-      expect(flexUrl.removeFilter('foo', 'bar').getQuery()).to.be.eq(encodeURI('?filter[foo]=test'));
-    });
-  });
+    expect(url.params).to.not.be.empty
+    expect(url.params).to.be.lengthOf(1)
+    expect(url.toString()).to.be.eq(`${baseUrl}?foo=hello`)
+  })
 
-  describe('#clearFilters', () => {
-    it('url with filters removing all of them', () => {
-      expect(createFlexUrl(url).query('foo[test]', 'bar').filterBy('foo', 'bar').filterBy('bar', 'test').clearFilters().getQuery()).to.be.eq('?foo%5Btest%5D=bar');
-    });
+  it('Append query parameter adds value to already present parameter', () => {
+    const url = flexUrl(baseUrl)
+    
+    url.queryParam('foo').add('bar').append(',test')
+    url.queryParam('foo').add('hello').append(' world')
 
-    it('url with filters removing all of them except one', () => {
-      expect(createFlexUrl(url).filterBy('foo', 'bar').filterBy('bar', 'test').clearFilters(['foo']).getQuery()).to.be.eq(encodeURI('?filter[foo]=bar'));
-    });
-  });
+    expect(url.params).to.not.be.empty
+    expect(url.params).to.be.lengthOf(2)
+    expect(url.toString()).to.be.eq(`${baseUrl}?foo=bar%2Ctest&foo=hello%20world`)
+  })
+  
+  it('Append query parameter throws error when no previous parameter present', () => {
+    const url = flexUrl(baseUrl)
+    
+    assert.throws(
+      () => url.queryParam('foo').append(',hello'),
+      'Query parameter value must be provided to append to the right parameter.'
+    )
 
-  describe('#hasSort', () => {
-    it('url with filters removing all of them', () => {
-      expect(createFlexUrl(url).sortByDesc('bar').hasSort('bar')).to.be.true;
-      expect(createFlexUrl(url).sortBy('bar').sortBy('fo').hasSort('foo')).to.be.false;
-    });
-  });
-});
+    expect(url.params).to.be.empty
+  })
+
+  it('Clear removes all parameters from URL', () => {
+    const url = flexUrl(baseUrl)
+    
+    url.queryParam('foo').add('bar')
+    url.queryParam('foo').add('hello,world')
+
+    expect(url.params).to.not.be.empty
+    expect(url.toString()).to.be.eq(`${baseUrl}?foo=bar&foo=hello%2Cworld`)
+    
+    url.clear()
+
+    expect(url.params).to.be.empty
+    expect(url.toString()).to.be.eq(baseUrl)
+  })
+})
+
+describe('Query Parameters Checking', () => {
+  it('Has checks query parameter with key and value is present on the URL', () => {
+    const url = flexUrl(baseUrl)
+    
+    url.queryParam('foo').add('bar')
+
+    expect(url.queryParams.has('foo')).to.be.true
+    expect(url.queryParams.has('foo', 'bar')).to.be.true
+    expect(url.queryParams.has('foo', 'hello')).to.be.false
+  })
+
+  it('Has checks query parameter with key and value is not present on the URL', () => {
+    const url = flexUrl(baseUrl)
+
+    expect(url.queryParams.has('foo', 'hello')).to.be.false
+  })
+})
+
+describe('Query Filter Parameters Checking', () => {
+  it('Has filter checks query filter parameter with filter key and value is present on the URL', () => {
+    const url = flexUrl(baseUrl)
+    
+    url.filter('foo').add('bar')
+
+    expect(url.filters.has('foo')).to.be.true
+    expect(url.filters.has('foo', 'bar')).to.be.true
+    expect(url.filters.has('foo', 'hello')).to.be.false
+  })
+})

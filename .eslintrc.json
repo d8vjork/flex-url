@@ -1,4 +1,5 @@
 {
+    "$schema": "https://json.schemastore.org/eslintrc",
     "env": {
         "browser": true,
         "commonjs": true,
@@ -7,6 +8,7 @@
     },
     "extends": [
         "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
         "prettier"
     ],
     "parser": "@typescript-eslint/parser",

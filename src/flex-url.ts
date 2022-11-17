@@ -3,13 +3,20 @@ import {QueryParameter, QueryParameterChecker, QueryParameterManipulator} from '
 
 export class FlexibleUrl {
   private baseUrl: string
+  private hashFragment = ''
   params: Array<QueryParameter> = []
 
   constructor(url?: string | URL) {
-    this.baseUrl = (typeof url === 'object' ? url.host : url) || (typeof window === 'undefined' ? '' : window.location.toString())
+    this.baseUrl = (typeof url === 'object' ? url.toString() : url) || (typeof window === 'undefined' ? '' : window.location.toString())
 
     const urlFragments = this.baseUrl.split('?')
-    const paramsFromUrl = urlFragments.length === 2 ? urlFragments.pop() : null
+    
+    const hashFragment = urlFragments[urlFragments.length - 1].split('#')
+    
+    this.hashFragment = hashFragment.length > 1 ? (hashFragment.pop() || '') : ''
+    this.hashFragment = this.hashFragment ? `#${this.hashFragment}` : ''
+
+    const paramsFromUrl = urlFragments.length === 2 ? (urlFragments.pop() || '').replace(this.hashFragment, '') : ''
 
     this.baseUrl = urlFragments.length === 0 ? this.baseUrl : urlFragments.join('')
 
@@ -73,8 +80,11 @@ export class FlexibleUrl {
    * @see Docs https://flex-url.opensoutheners.com/docs/toString
    */
   toString() {
-    return [this.baseUrl, this.params.map((param) => param.toString()).join('&')]
+    return [
+      this.baseUrl.endsWith('/') ? this.baseUrl.slice(0, -1) : this.baseUrl,
+      this.params.map((param) => param.toString()).join('&')
+    ]
       .filter(Boolean)
-      .join('?')
+      .join('?') + this.hashFragment
   }
 }

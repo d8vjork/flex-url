@@ -27,6 +27,25 @@ describe('URL Parsing', () => {
 
     expect(url.toString()).to.be.eq(sameUrl.toString())
   })
+
+  it('Passing URL native browser object will parse', () => {
+    const nativeUrl = new URL(baseUrl)
+    const url = flexUrl(nativeUrl)
+
+    url.queryParam('test').add('hello')
+
+    expect(url.toString()).to.be.eq(`${baseUrl}?test=hello`)
+  })
+
+  it('Passing URL with hash fragment respects order when parsing and serialising', () => {
+    const nonHashedUrl = `${baseUrl}?filter[hello]=world`
+    const hashFragment = '#test'
+    const url = flexUrl(`${nonHashedUrl}${hashFragment}`)
+
+    url.queryParam('test').add('hello')
+
+    expect(url.toString()).to.be.eq(`${nonHashedUrl}&test=hello${hashFragment}`)
+  })
 })
 
 describe('Query Parameters Manipulation', () => {

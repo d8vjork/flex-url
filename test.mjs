@@ -20,7 +20,9 @@ import { flexUrl } from './dist/index.mjs';
 // Actual testing
 // ============
 
-const url = flexUrl('https://example.org')
+const url = flexUrl(new URL('https://example.org/?filter[hello]=world#test'))
+
+url.queryParam('test').add('hello')
 
 console.log(url.toString())
 

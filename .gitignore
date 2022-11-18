@@ -5,7 +5,7 @@ node_modules
 .bash_history
 dist
 types
-test.js
+/test.mjs
 .nyc_output
 coverage
 .temp

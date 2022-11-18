@@ -1,0 +1,10 @@
+{
+  "space": true,
+  "rules": {
+    "max-params": [
+      "error",
+      5
+    ],
+    "@typescript-eslint/member-ordering": "off"
+  }
+}

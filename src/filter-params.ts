@@ -1,59 +1,55 @@
-import { FlexibleUrl } from "./flex-url.js";
-import { QueryParameterManipulator, QueryParamModifiers } from "./query-params.js";
+import {type FlexibleUrl} from './flex-url.js';
+import {type QueryParameterManipulator, type QueryParameterModifiers} from './query-params.js';
 
-export type FilterParamConditional = 'and' | 'or' | undefined
+export type FilterParameterConditional = 'and' | 'or' | undefined;
 
 export class FilterParameterChecker {
-  private flexUrl: FlexibleUrl
-
-  constructor(flexUrl: FlexibleUrl) {
-    this.flexUrl = flexUrl
+  constructor(private readonly flexUrl: FlexibleUrl) {
+    this.flexUrl = flexUrl;
   }
 
-  has(filterKey: string, value?: string, modifiers: QueryParamModifiers = []) {
-    return this.flexUrl.queryParams.has('filter', value, [filterKey, ...modifiers])
+  has(filterKey: string, value?: string, modifiers: QueryParameterModifiers = []) {
+    return this.flexUrl.queryParams.has('filter', value, [filterKey, ...modifiers]);
   }
 }
 
 export class FilterParameterManipulator {
-  private manipulator: QueryParameterManipulator
-  private filterKey: string
-  private conditional: FilterParamConditional
-  
-  constructor(manipulator: QueryParameterManipulator, filterKey: string) {
-    this.manipulator = manipulator
-    this.filterKey = filterKey
+  private conditional: FilterParameterConditional;
+
+  constructor(private readonly manipulator: QueryParameterManipulator, private readonly filterKey: string) {
+    this.manipulator = manipulator;
+    this.filterKey = filterKey;
   }
 
   static fromUrl(flexUrl: FlexibleUrl, filterKey: string) {
-    return new FilterParameterManipulator(flexUrl.queryParam('filter'), filterKey)
+    return new FilterParameterManipulator(flexUrl.queryParam('filter'), filterKey);
   }
 
   get or() {
-    this.conditional = 'or'
+    this.conditional = 'or';
 
-    return this
+    return this;
   }
-  
+
   get and() {
-    this.conditional = 'and'
+    this.conditional = 'and';
 
-    return this
+    return this;
   }
 
-  add(value: string, modifiers: QueryParamModifiers = []) {
-    return new FilterParameterManipulator(this.manipulator.add(value, [this.filterKey, ...modifiers]), this.filterKey)
+  add(value: string, modifiers: QueryParameterModifiers = []) {
+    return new FilterParameterManipulator(this.manipulator.add(value, [this.filterKey, ...modifiers]), this.filterKey);
   }
 
-  set(value: string, modifiers: QueryParamModifiers = []) {
-    return new FilterParameterManipulator(this.manipulator.set(value, [this.filterKey, ...modifiers]), this.filterKey)
+  set(value: string, modifiers: QueryParameterModifiers = []) {
+    return new FilterParameterManipulator(this.manipulator.set(value, [this.filterKey, ...modifiers]), this.filterKey);
   }
 
   append(value: string) {
-    return new FilterParameterManipulator(this.manipulator.append(value), this.filterKey)
+    return new FilterParameterManipulator(this.manipulator.append(value), this.filterKey);
   }
 
-  remove(value: string, modifiers: QueryParamModifiers = []) {
-    return this.manipulator.remove(value, [this.filterKey, ...modifiers])
+  remove(value: string, modifiers: QueryParameterModifiers = []) {
+    return this.manipulator.remove(value, [this.filterKey, ...modifiers]);
   }
 }

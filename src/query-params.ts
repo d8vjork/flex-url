@@ -1,202 +1,198 @@
-import { FlexibleUrl } from './flex-url.js'
-import { getAllIndexes, setValueFromIndexes } from "./util.js"
+import {type FlexibleUrl} from './flex-url.js';
+import {getAllIndexes, setValueFromIndexes} from './util.js';
 
-export type QueryParamModifiers = Array<string>
+export type QueryParameterModifiers = string[];
 
 export class QueryParameter {
-  #name: string
-  #value: string
-  #modifiers: QueryParamModifiers
+  #name: string;
+  #value: string;
+  #modifiers: QueryParameterModifiers;
 
-  constructor(name: string, value: string, modifiers: QueryParamModifiers = []) {
-    this.#name = name
-    this.#value = value
-    this.#modifiers = modifiers
+  constructor(name: string, value: string, modifiers: QueryParameterModifiers = []) {
+    this.#name = name;
+    this.#value = value;
+    this.#modifiers = modifiers;
   }
 
-  static queryParamKey(name: string, modifiers: QueryParamModifiers = []) {
-    return `${name}${modifiers.map((modifier) => `[${modifier}]`).join('')}`
+  static queryParamKey(name: string, modifiers: QueryParameterModifiers = []) {
+    return `${name}${modifiers.map(modifier => `[${modifier}]`).join('')}`;
   }
 
   setValue(newValue: string) {
-    this.#value = newValue
+    this.#value = newValue;
 
-    return this
+    return this;
   }
 
-  setModifiers(newModifiers: QueryParamModifiers) {
-    this.#modifiers = newModifiers
+  setModifiers(newModifiers: QueryParameterModifiers) {
+    this.#modifiers = newModifiers;
 
-    return this
+    return this;
   }
 
   get name() {
-    return encodeURIComponent(this.#name)
+    return encodeURIComponent(this.#name);
   }
-  
+
   get value() {
-    return encodeURIComponent(this.#value)
+    return encodeURIComponent(this.#value);
   }
-  
+
   get modifiers() {
-    return this.#modifiers.map(encodeURIComponent)
+    return this.#modifiers.map(modifier => encodeURIComponent(modifier));
   }
 
   get queryParamKey() {
-    return QueryParameter.queryParamKey(this.name, this.modifiers)
+    return QueryParameter.queryParamKey(this.name, this.modifiers);
   }
 
   toString() {
-    return `${this.queryParamKey}=${this.value}`
+    return `${this.queryParamKey}=${this.value}`;
   }
 
   static fromString(fragment: string) {
-    const [queryParamKey, value] = decodeURIComponent(fragment).split('=')
+    const [queryParameterKey, value] = decodeURIComponent(fragment).split('=');
 
-    let key = queryParamKey
-    let modifiers: QueryParamModifiers = []
+    let key = queryParameterKey;
+    let modifiers: QueryParameterModifiers = [];
 
-    if (queryParamKey.includes('[')) {
-      const queryParamKeyFragments = queryParamKey.split(/\[|\|/)
-      
-      key = queryParamKeyFragments.shift() as string
-      
-      modifiers = queryParamKeyFragments.map((subFragment) => subFragment.replace(']', ''))
+    if (queryParameterKey.includes('[')) {
+      const queryParameterKeyFragments = queryParameterKey.split(/\[|\|/);
+
+      key = queryParameterKeyFragments.shift()!;
+
+      modifiers = queryParameterKeyFragments.map(subFragment => subFragment.replace(']', ''));
     }
-    
+
     if (!key) {
-      return null
+      return null;
     }
 
-    return new QueryParameter(key, value, modifiers)
+    return new QueryParameter(key, value, modifiers);
   }
 }
 
 export class QueryParameterChecker {
-  private flexUrl: FlexibleUrl
-
-  constructor(flexUrl: FlexibleUrl) {
-    this.flexUrl = flexUrl
+  constructor(private readonly flexUrl: FlexibleUrl) {
+    this.flexUrl = flexUrl;
   }
 
-  static find(flexUrl: FlexibleUrl, key: string, value?: string, modifiers?: QueryParamModifiers) {
-    return flexUrl.params.findIndex((queryParam) =>
-      queryParam.queryParamKey === QueryParameter.queryParamKey(key, modifiers)
-        && (value ? queryParam.value === value : true)
-    )
+  static find(flexUrl: FlexibleUrl, key: string, value?: string, modifiers?: QueryParameterModifiers) {
+    return flexUrl.params.findIndex(queryParameter =>
+      queryParameter.queryParamKey === QueryParameter.queryParamKey(key, modifiers)
+        && (value ? queryParameter.value === value : true),
+    );
   }
 
-  has(key: string, value?: string, modifiers?: QueryParamModifiers) {
-    return QueryParameterChecker.find(this.flexUrl, key, value, modifiers) !== -1
+  has(key: string, value?: string, modifiers?: QueryParameterModifiers) {
+    return QueryParameterChecker.find(this.flexUrl, key, value, modifiers) !== -1;
   }
 }
 
 export class QueryParameterManipulator {
-  private flexUrl: FlexibleUrl
-  private name: string
-  private value: string | undefined
-  private indexes: Array<number>
+  constructor(private flexUrl: FlexibleUrl, private readonly name: string, private readonly value?: string, modifiers: QueryParameterModifiers = [], private readonly indexes: number[] = []) {
+    this.flexUrl = flexUrl;
+    this.name = name;
+    this.value = value;
 
-  constructor(flexUrl: FlexibleUrl, name: string, value?: string, modifiers: QueryParamModifiers = [], indexes?: Array<number>) {
-    this.flexUrl = flexUrl
-    this.name = name
-    this.value = value
-
-    this.indexes = indexes || getAllIndexes(flexUrl.params, (param) => 
-      param.queryParamKey === QueryParameter.queryParamKey(name, modifiers)
-        && (value ? param.value === value : true)
-    )
+    this.indexes = indexes.length > 0
+      ? indexes
+      : getAllIndexes(flexUrl.params, parameter =>
+        parameter.queryParamKey === QueryParameter.queryParamKey(name, modifiers)
+          && (value ? parameter.value === value : true),
+      );
   }
 
-  static fromIndexes(flexUrl: FlexibleUrl, name: string, indexes: Array<number>) {
-    return new QueryParameterManipulator(flexUrl, name, undefined, [], indexes)
+  static fromIndexes(flexUrl: FlexibleUrl, name: string, indexes: number[]) {
+    return new QueryParameterManipulator(flexUrl, name, undefined, [], indexes);
   }
 
   /**
    * Add query parameter with value and/or modifiers.
-   * 
+   *
    * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#set
    */
-  set(value: string, modifiers: QueryParamModifiers = []) {
-    setValueFromIndexes(this.flexUrl.params, this.indexes, new QueryParameter(this.name, value, modifiers))
+  set(value: string, modifiers: QueryParameterModifiers = []) {
+    setValueFromIndexes(this.flexUrl.params, this.indexes, new QueryParameter(this.name, value, modifiers));
 
-    return this
+    return this;
   }
 
   /**
    * Add query parameter with value and/or modifiers.
-   * 
+   *
    * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#add
    */
-  add(value: string, modifiers: QueryParamModifiers = []) {
-    const existing = QueryParameterChecker.find(this.flexUrl, this.name, value, modifiers)
+  add(value: string, modifiers: QueryParameterModifiers = []) {
+    const existing = QueryParameterChecker.find(this.flexUrl, this.name, value, modifiers);
 
     if (existing !== -1) {
-      return QueryParameterManipulator.fromIndexes(this.flexUrl, this.name, [existing])
+      return QueryParameterManipulator.fromIndexes(this.flexUrl, this.name, [existing]);
     }
 
-    this.flexUrl.params.push(new QueryParameter(this.name, value, modifiers))
+    this.flexUrl.params.push(new QueryParameter(this.name, value, modifiers));
 
-    return new QueryParameterManipulator(this.flexUrl, this.name, value, modifiers)
+    return new QueryParameterManipulator(this.flexUrl, this.name, value, modifiers);
   }
-  
+
   /**
    * Append value to query parameter.
-   * 
+   *
    * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#append
    */
   append(appendValue: string) {
-    if (!this.value && this.indexes.length === 0) {
-      throw Error('Query parameter value must be provided to append to the right parameter.')
+    if (!this.value && !this.indexes?.length) {
+      throw new Error('Query parameter value must be provided to append to the right parameter.');
     }
 
-    setValueFromIndexes(this.flexUrl.params, this.indexes, (old) => old.setValue(`${old.value}${appendValue}`))
+    setValueFromIndexes(this.flexUrl.params, this.indexes, old => old.setValue(`${old.value}${appendValue}`));
 
-    return this
+    return this;
   }
 
   /**
    * Conditionally add or remove query parameter with value and/or modifiers.
-   * 
+   *
    * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#toggle
    */
-  toggle(value: string, modifiers: QueryParamModifiers = []) {
-    const existing = QueryParameterChecker.find(this.flexUrl, this.name, value, modifiers)
+  toggle(value: string, modifiers: QueryParameterModifiers = []) {
+    const existing = QueryParameterChecker.find(this.flexUrl, this.name, value, modifiers);
 
     if (existing !== -1) {
-      this.remove(value, modifiers, existing)
+      this.remove(value, modifiers, existing);
 
-      return this
+      return this;
     }
 
-    return this.add(value, modifiers)
+    return this.add(value, modifiers);
   }
 
   /**
    * Remove query parameter with value and/or modifiers.
-   * 
+   *
    * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#remove
    */
-  remove(value: string, modifiers: QueryParamModifiers = [], index?: number) {
-    const existing = index || QueryParameterChecker.find(this.flexUrl, this.name, value, modifiers)
+  remove(value: string, modifiers: QueryParameterModifiers = [], index?: number) {
+    const existing = index ?? QueryParameterChecker.find(this.flexUrl, this.name, value, modifiers);
 
     if (existing !== -1) {
-      delete this.flexUrl.params[existing]
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+      delete this.flexUrl.params[existing];
 
-      this.flexUrl.params = this.flexUrl.params.filter(Boolean)
+      this.flexUrl.params = this.flexUrl.params.filter(Boolean);
     }
 
-    return this.flexUrl
+    return this.flexUrl;
   }
 
   /**
    * Set query parameter modifiers.
-   * 
+   *
    * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#withModifiers
    */
-  withModifiers(modifiers: QueryParamModifiers) {
-    setValueFromIndexes(this.flexUrl.params, this.indexes, (param) => param.setModifiers(modifiers))
+  withModifiers(modifiers: QueryParameterModifiers) {
+    setValueFromIndexes(this.flexUrl.params, this.indexes, parameter => parameter.setModifiers(modifiers));
 
-    return this
+    return this;
   }
 }

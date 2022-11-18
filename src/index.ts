@@ -1,5 +1,5 @@
-import { FlexibleUrl } from "./flex-url.js"
+import {FlexibleUrl} from './flex-url.js';
 
 export function flexUrl(url?: string | URL) {
-  return new FlexibleUrl(url)
+  return new FlexibleUrl(url);
 }

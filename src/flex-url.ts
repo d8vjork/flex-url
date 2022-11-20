@@ -93,3 +93,7 @@ export class FlexibleUrl {
       .join('?') + this.hashFragment;
   }
 }
+
+export function flexUrl(url?: string | URL | Location) {
+  return new FlexibleUrl(url);
+}

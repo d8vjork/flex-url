@@ -14,43 +14,43 @@ export class QueryParameter {
     this.#modifiers = modifiers;
   }
 
-  static queryParamKey(name: string, modifiers: QueryParameterModifiers = []) {
+  static queryParamKey(name: string, modifiers: QueryParameterModifiers = []): string {
     return `${name}${modifiers.map(modifier => `[${modifier}]`).join('')}`;
   }
 
-  setValue(newValue: string) {
+  setValue(newValue: string): this {
     this.#value = newValue;
 
     return this;
   }
 
-  setModifiers(newModifiers: QueryParameterModifiers) {
+  setModifiers(newModifiers: QueryParameterModifiers): this {
     this.#modifiers = newModifiers;
 
     return this;
   }
 
-  get name() {
+  get name(): string {
     return encodeURIComponent(this.#name);
   }
 
-  get value() {
+  get value(): string {
     return encodeURIComponent(this.#value);
   }
 
-  get modifiers() {
+  get modifiers(): string[] {
     return this.#modifiers.map(modifier => encodeURIComponent(modifier));
   }
 
-  get queryParamKey() {
+  get queryParamKey(): string {
     return QueryParameter.queryParamKey(this.name, this.modifiers);
   }
 
-  toString() {
+  toString(): string {
     return `${this.queryParamKey}=${this.value}`;
   }
 
-  static fromString(fragment: string) {
+  static fromString(fragment: string): undefined | QueryParameter {
     const [queryParameterKey, value] = decodeURIComponent(fragment).split('=');
 
     let key = queryParameterKey;
@@ -65,7 +65,7 @@ export class QueryParameter {
     }
 
     if (!key) {
-      return null;
+      return undefined;
     }
 
     return new QueryParameter(key, value, modifiers);
@@ -77,14 +77,14 @@ export class QueryParameterChecker {
     this.flexUrl = flexUrl;
   }
 
-  static find(flexUrl: FlexibleUrl, key: string, value?: string, modifiers?: QueryParameterModifiers) {
+  static find(flexUrl: FlexibleUrl, key: string, value?: string, modifiers?: QueryParameterModifiers): number {
     return flexUrl.params.findIndex(queryParameter =>
       queryParameter.queryParamKey === QueryParameter.queryParamKey(key, modifiers)
         && (value ? queryParameter.value === value : true),
     );
   }
 
-  has(key: string, value?: string, modifiers?: QueryParameterModifiers) {
+  has(key: string, value?: string, modifiers?: QueryParameterModifiers): boolean {
     return QueryParameterChecker.find(this.flexUrl, key, value, modifiers) !== -1;
   }
 }
@@ -103,7 +103,7 @@ export class QueryParameterManipulator {
       );
   }
 
-  static fromIndexes(flexUrl: FlexibleUrl, name: string, indexes: number[]) {
+  static fromIndexes(flexUrl: FlexibleUrl, name: string, indexes: number[]): QueryParameterManipulator {
     return new QueryParameterManipulator(flexUrl, name, undefined, [], indexes);
   }
 
@@ -112,7 +112,7 @@ export class QueryParameterManipulator {
    *
    * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#set
    */
-  set(value: string, modifiers: QueryParameterModifiers = []) {
+  set(value: string, modifiers: QueryParameterModifiers = []): this {
     setValueFromIndexes(this.flexUrl.params, this.indexes, new QueryParameter(this.name, value, modifiers));
 
     return this;
@@ -123,7 +123,7 @@ export class QueryParameterManipulator {
    *
    * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#add
    */
-  add(value: string, modifiers: QueryParameterModifiers = []) {
+  add(value: string, modifiers: QueryParameterModifiers = []): QueryParameterManipulator {
     const existing = QueryParameterChecker.find(this.flexUrl, this.name, value, modifiers);
 
     if (existing !== -1) {
@@ -140,7 +140,7 @@ export class QueryParameterManipulator {
    *
    * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#append
    */
-  append(appendValue: string) {
+  append(appendValue: string): this {
     if (!this.value && !this.indexes?.length) {
       throw new Error('Query parameter value must be provided to append to the right parameter.');
     }
@@ -155,7 +155,7 @@ export class QueryParameterManipulator {
    *
    * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#toggle
    */
-  toggle(value: string, modifiers: QueryParameterModifiers = []) {
+  toggle(value: string, modifiers: QueryParameterModifiers = []): QueryParameterManipulator {
     const existing = QueryParameterChecker.find(this.flexUrl, this.name, value, modifiers);
 
     if (existing !== -1) {
@@ -172,7 +172,7 @@ export class QueryParameterManipulator {
    *
    * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#remove
    */
-  remove(value: string, modifiers: QueryParameterModifiers = [], index?: number) {
+  remove(value: string, modifiers: QueryParameterModifiers = [], index?: number): FlexibleUrl {
     const existing = index ?? QueryParameterChecker.find(this.flexUrl, this.name, value, modifiers);
 
     if (existing !== -1) {
@@ -190,7 +190,7 @@ export class QueryParameterManipulator {
    *
    * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#withModifiers
    */
-  withModifiers(modifiers: QueryParameterModifiers) {
+  withModifiers(modifiers: QueryParameterModifiers): this {
     setValueFromIndexes(this.flexUrl.params, this.indexes, parameter => parameter.setModifiers(modifiers));
 
     return this;

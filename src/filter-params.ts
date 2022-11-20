@@ -21,35 +21,35 @@ export class FilterParameterManipulator {
     this.filterKey = filterKey;
   }
 
-  static fromUrl(flexUrl: FlexibleUrl, filterKey: string) {
+  static fromUrl(flexUrl: FlexibleUrl, filterKey: string): FilterParameterManipulator {
     return new FilterParameterManipulator(flexUrl.queryParam('filter'), filterKey);
   }
 
-  get or() {
+  get or(): this {
     this.conditional = 'or';
 
     return this;
   }
 
-  get and() {
+  get and(): this {
     this.conditional = 'and';
 
     return this;
   }
 
-  add(value: string, modifiers: QueryParameterModifiers = []) {
+  add(value: string, modifiers: QueryParameterModifiers = []): FilterParameterManipulator {
     return new FilterParameterManipulator(this.manipulator.add(value, [this.filterKey, ...modifiers]), this.filterKey);
   }
 
-  set(value: string, modifiers: QueryParameterModifiers = []) {
+  set(value: string, modifiers: QueryParameterModifiers = []): FilterParameterManipulator {
     return new FilterParameterManipulator(this.manipulator.set(value, [this.filterKey, ...modifiers]), this.filterKey);
   }
 
-  append(value: string) {
+  append(value: string): FilterParameterManipulator {
     return new FilterParameterManipulator(this.manipulator.append(value), this.filterKey);
   }
 
-  remove(value: string, modifiers: QueryParameterModifiers = []) {
+  remove(value: string, modifiers: QueryParameterModifiers = []): FlexibleUrl {
     return this.manipulator.remove(value, [this.filterKey, ...modifiers]);
   }
 

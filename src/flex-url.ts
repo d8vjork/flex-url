@@ -37,7 +37,7 @@ export class FlexibleUrl {
    *
    * @see Docs https://flex-url.opensoutheners.com/docs/queryParams
    */
-  queryParam(name: string, value?: string) {
+  queryParam(name: string, value?: string): QueryParameterManipulator {
     return new QueryParameterManipulator(this, name, value);
   }
 
@@ -46,7 +46,7 @@ export class FlexibleUrl {
    *
    * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#check
    */
-  get queryParams() {
+  get queryParams(): QueryParameterChecker {
     return new QueryParameterChecker(this);
   }
 
@@ -55,7 +55,7 @@ export class FlexibleUrl {
    *
    * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#filters
    */
-  filter(filterKey: string) {
+  filter(filterKey: string): FilterParameterManipulator {
     return FilterParameterManipulator.fromUrl(this, filterKey);
   }
 
@@ -64,7 +64,7 @@ export class FlexibleUrl {
    *
    * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#filters
    */
-  get filters() {
+  get filters(): FilterParameterChecker {
     return new FilterParameterChecker(this);
   }
 
@@ -73,7 +73,7 @@ export class FlexibleUrl {
    *
    * @see Docs https://flex-url.opensoutheners.com/docs/flexUrl#clear
    */
-  clear() {
+  clear(): this {
     this.params = [];
 
     return this;
@@ -84,7 +84,7 @@ export class FlexibleUrl {
    *
    * @see Docs https://flex-url.opensoutheners.com/docs/toString
    */
-  toString() {
+  toString(): string {
     return [
       this.baseUrl,
       this.params.map(parameter => parameter.toString()).join('&'),
@@ -94,6 +94,6 @@ export class FlexibleUrl {
   }
 }
 
-export function flexUrl(url?: string | URL | Location) {
+export function flexUrl(url?: string | URL | Location): FlexibleUrl {
   return new FlexibleUrl(url);
 }

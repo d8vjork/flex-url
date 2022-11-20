@@ -1,7 +1,7 @@
 {
   "name": "flex-url",
   "description": "Zero-dependency utility for parsing and modifying URL params",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "source": "src/index.ts",
   "exports": {

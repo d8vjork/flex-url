@@ -6,69 +6,73 @@ export class FlexibleUrl {
   private readonly baseUrl: string;
   private readonly hashFragment: string;
 
-  constructor(url?: string | URL) {
-    this.baseUrl = (typeof url === 'object' ? url.toString() : url)
-      ?? (typeof window === 'undefined' ? '' : window.location.toString());
+  constructor(url?: string | URL | Location) {
+    let parsedUrl = typeof url === 'string' ? new URL(url) : url;
 
-    const urlFragments = this.baseUrl.split('?');
+    if (!parsedUrl && typeof window !== 'undefined') {
+      parsedUrl = window.location;
+    }
 
-    const hashFragment = urlFragments[urlFragments.length - 1].split('#');
+    if (!parsedUrl) {
+      throw new Error('Need to provide a valid URL');
+    }
 
-    this.hashFragment = hashFragment.length > 1 ? (hashFragment.pop() ?? '') : '';
-    this.hashFragment = this.hashFragment ? `#${this.hashFragment}` : '';
+    this.hashFragment = parsedUrl.hash;
 
-    const parametersFromUrl = urlFragments.length === 2 ? (urlFragments.pop() ?? '').replace(this.hashFragment, '') : '';
+    this.baseUrl = parsedUrl.origin;
 
-    this.baseUrl = urlFragments.length === 0 ? this.baseUrl : urlFragments.join('');
+    const parametersFromUrl = parsedUrl.search.replace('?', '').split('&');
 
-    if (parametersFromUrl) {
-      this.params = parametersFromUrl.split('&')
-        .map(fragment => QueryParameter.fromString(fragment))
-        .filter(parameter => parameter !== null) as QueryParameter[];
+    for (let i = 0; i < parametersFromUrl.length; i++) {
+      const queryParameter = QueryParameter.fromString(parametersFromUrl[i]);
+
+      if (queryParameter) {
+        this.params.push(queryParameter);
+      }
     }
   }
 
   /**
-	 * Manipulate URL query parameters
-	 *
-	 * @see Docs https://flex-url.opensoutheners.com/docs/queryParams
-	 */
+   * Manipulate URL query parameters
+   *
+   * @see Docs https://flex-url.opensoutheners.com/docs/queryParams
+   */
   queryParam(name: string, value?: string) {
     return new QueryParameterManipulator(this, name, value);
   }
 
   /**
-	 * Check URL query parameters
-	 *
-	 * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#check
-	 */
+   * Check URL query parameters
+   *
+   * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#check
+   */
   get queryParams() {
     return new QueryParameterChecker(this);
   }
 
   /**
-	 * Manipulate URL query filter parameters
-	 *
-	 * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#filters
-	 */
+   * Manipulate URL query filter parameters
+   *
+   * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#filters
+   */
   filter(filterKey: string) {
     return FilterParameterManipulator.fromUrl(this, filterKey);
   }
 
   /**
-	 * Check URL query filter parameters
-	 *
-	 * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#filters
-	 */
+   * Check URL query filter parameters
+   *
+   * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#filters
+   */
   get filters() {
     return new FilterParameterChecker(this);
   }
 
   /**
-	 * Clear all params from URL
-	 *
-	 * @see Docs https://flex-url.opensoutheners.com/docs/flexUrl#clear
-	 */
+   * Clear all params from URL
+   *
+   * @see Docs https://flex-url.opensoutheners.com/docs/flexUrl#clear
+   */
   clear() {
     this.params = [];
 
@@ -76,13 +80,13 @@ export class FlexibleUrl {
   }
 
   /**
-	 * Parse Flex URL back to string
-	 *
-	 * @see Docs https://flex-url.opensoutheners.com/docs/toString
-	 */
+   * Parse Flex URL back to string
+   *
+   * @see Docs https://flex-url.opensoutheners.com/docs/toString
+   */
   toString() {
     return [
-      this.baseUrl.endsWith('/') ? this.baseUrl.slice(0, -1) : this.baseUrl,
+      this.baseUrl,
       this.params.map(parameter => parameter.toString()).join('&'),
     ]
       .filter(Boolean)

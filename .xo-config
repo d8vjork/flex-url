@@ -5,6 +5,8 @@
       "error",
       5
     ],
-    "@typescript-eslint/member-ordering": "off"
+    "unicorn/no-for-loop": "off",
+    "@typescript-eslint/member-ordering": "off",
+    "@typescript-eslint/prefer-for-of": "off"
   }
 }

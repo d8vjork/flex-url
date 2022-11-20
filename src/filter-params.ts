@@ -52,4 +52,8 @@ export class FilterParameterManipulator {
   remove(value: string, modifiers: QueryParameterModifiers = []) {
     return this.manipulator.remove(value, [this.filterKey, ...modifiers]);
   }
+
+  toggle(value: string, modifiers: QueryParameterModifiers = []): FilterParameterManipulator {
+    return new FilterParameterManipulator(this.manipulator.toggle(value, [this.filterKey, ...modifiers]), this.filterKey);
+  }
 }

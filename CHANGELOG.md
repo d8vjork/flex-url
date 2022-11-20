@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.4] - 2022-11-20
+
+### Added
+
+- Filters toggle method
+
+### Changed
+
+- Add return types everywhere
+
 ## [1.0.3] - 2022-11-20
 
 ### Changed

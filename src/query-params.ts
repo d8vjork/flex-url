@@ -4,54 +4,30 @@ import {getAllIndexes, setValueFromIndexes} from './util.js';
 export type QueryParameterModifiers = string[];
 
 export class QueryParameter {
-  #name: string;
-  #value: string;
-  #modifiers: QueryParameterModifiers;
-
-  constructor(name: string, value: string, modifiers: QueryParameterModifiers = []) {
-    this.#name = name;
-    this.#value = value;
-    this.#modifiers = modifiers;
-  }
+  constructor(public name: string, public value: string, public modifiers: QueryParameterModifiers = []) {}
 
   static queryParamKey(name: string, modifiers: QueryParameterModifiers = []): string {
     return `${name}${modifiers.map(modifier => `[${modifier}]`).join('')}`;
   }
 
   setValue(newValue: string): this {
-    this.#value = newValue;
+    this.value = newValue;
 
     return this;
   }
 
   setModifiers(newModifiers: QueryParameterModifiers): this {
-    this.#modifiers = newModifiers;
+    this.modifiers = newModifiers;
 
     return this;
   }
 
-  get name(): string {
-    return encodeURIComponent(this.#name);
-  }
-
-  get value(): string {
-    return encodeURIComponent(this.#value);
-  }
-
-  get rawValue(): string {
-    return this.#value;
-  }
-
-  get modifiers(): string[] {
-    return this.#modifiers.map(modifier => encodeURIComponent(modifier));
-  }
-
   get queryParamKey(): string {
-    return QueryParameter.queryParamKey(this.#name, this.#modifiers);
+    return QueryParameter.queryParamKey(this.name, this.modifiers);
   }
 
   toString(): string {
-    return `${QueryParameter.queryParamKey(this.name, this.modifiers)}=${this.value}`;
+    return `${QueryParameter.queryParamKey(encodeURIComponent(this.name), this.modifiers.map(modifier => encodeURIComponent(modifier)))}=${encodeURIComponent(this.value)}`;
   }
 
   static fromString(fragment: string): undefined | QueryParameter {
@@ -81,15 +57,26 @@ export class QueryParameterChecker {
     this.flexUrl = flexUrl;
   }
 
-  static find(flexUrl: FlexibleUrl, key: string, value?: string, modifiers?: QueryParameterModifiers): number {
-    return flexUrl.params.findIndex(queryParameter =>
-      queryParameter.queryParamKey === QueryParameter.queryParamKey(key, modifiers)
-        && (value ? queryParameter.value.toLocaleLowerCase() === value.toLocaleLowerCase() : true),
-    );
+  static find(flexUrl: FlexibleUrl, key: string, value?: string, modifiers?: QueryParameterModifiers, strict = true): number {
+    return flexUrl.params.findIndex(queryParameter => {
+      if (queryParameter.queryParamKey !== QueryParameter.queryParamKey(key, modifiers)) {
+        return false;
+      }
+
+      if (strict) {
+        return value ? queryParameter.value.toLocaleLowerCase() === value.toLocaleLowerCase() : true;
+      }
+
+      return value ? queryParameter.value.includes(value) : true;
+    });
   }
 
-  has(key: string, value?: string, modifiers?: QueryParameterModifiers): boolean {
-    return QueryParameterChecker.find(this.flexUrl, key, value, modifiers) !== -1;
+  includes(key: string, value?: string, modifiers?: QueryParameterModifiers): boolean {
+    return this.has(key, value, modifiers, false);
+  }
+
+  has(key: string, value?: string, modifiers?: QueryParameterModifiers, strict = true): boolean {
+    return QueryParameterChecker.find(this.flexUrl, key, value, modifiers, strict) !== -1;
   }
 }
 
@@ -164,7 +151,7 @@ export class QueryParameterManipulator {
     }
 
     setValueFromIndexes(this.flexUrl.params, this.indexes, old =>
-      old.setValue(typeof replacement === 'function' ? replacement(old.rawValue) : replacement),
+      old.setValue(typeof replacement === 'function' ? replacement(old.value) : replacement),
     );
 
     return this;

@@ -1,6 +1,6 @@
 import {type FlexibleUrl} from './flex-url.js';
 import {QueryParameter, QueryParameterManipulator, type QueryParameterModifiers} from './query-params.js';
-import { getAllIndexes } from './util.js';
+import {getAllIndexes} from './util.js';
 
 export type FilterParameterConditional = 'and' | 'or' | undefined;
 
@@ -11,12 +11,12 @@ export class FilterParameterChecker {
     const filterValues = values.join(',').toLocaleLowerCase().split(',');
 
     return getAllIndexes(flexUrl.params, parameter => {
-      if (!parameter.rawValue.includes(',')) {
+      if (!parameter.value.includes(',')) {
         return false;
       }
 
       if (parameter.queryParamKey === QueryParameter.queryParamKey('filter', [filterKey, ...modifiers])) {
-        const parameterValues = parameter.rawValue.toLocaleLowerCase().split(',');
+        const parameterValues = parameter.value.toLocaleLowerCase().split(',');
 
         return strict
           ? parameterValues.every(parameterValue => filterValues.includes(parameterValue))
@@ -45,7 +45,7 @@ export class FilterParameterChecker {
     const isCheckingOr = Array.isArray(values);
 
     if (!isCheckingOr) {
-      return this.flexUrl.queryParams.has('filter', values, [filterKey, ...modifiers]);
+      return this.flexUrl.queryParams.has('filter', values, [filterKey, ...modifiers], strict);
     }
 
     return FilterParameterChecker.find(this.flexUrl, filterKey, values, modifiers, strict).length > 0;
@@ -113,9 +113,17 @@ export class FilterParameterManipulator {
             this.filterKey,
           );
 
-        return this.manipulator.url.filters.includes(this.filterKey, [value])
-          ? instanceFromIndexes.replace(oldValue => oldValue.split(',').filter(v => v.toLocaleLowerCase() !== value.toLocaleLowerCase()).join(','))
-          : instanceFromIndexes.append(`,${value}`);
+        return instanceFromIndexes.replace(oldValue => {
+          const valueAsArray = oldValue ? oldValue.split(',') : [];
+
+          if (valueAsArray.includes(value)) {
+            return valueAsArray.filter(v => v.toLocaleLowerCase() !== value.toLocaleLowerCase()).join(',');
+          }
+
+          valueAsArray.push(value);
+
+          return valueAsArray.join(',');
+        });
       }
 
       return this.add(value);

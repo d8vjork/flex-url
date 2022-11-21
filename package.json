@@ -9,7 +9,8 @@
     "packages/*"
   ],
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "build": "yarn turbo run build",
+    "test": "yarn turbo run test"
   },
   "devDependencies": {
     "@types/chai": "^4.2.22",

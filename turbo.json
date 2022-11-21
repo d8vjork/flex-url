@@ -10,13 +10,16 @@
       ]
     },
     "test": {
-      "outputs": [],
+      "outputs": [
+        "coverage/**"
+      ],
       "inputs": [
         "src/**/*.tsx",
         "src/**/*.ts",
         "tests/**/*.ts",
         "tests/**/*.tsx"
-      ]
+      ],
+      "outputMode": "full"
     },
     "lint": {
       "outputs": []

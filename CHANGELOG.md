@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2022-11-21
+
+### Added
+
+- `strict` parameter to `has` and `find` methods on `queryParams`
+- `includes` method on `queryParams`
+
+### Changed
+
+- Internal API on `QueryParameter` class
+- Some minor internal changes on `QueryParameterChecker` and `FilterParameterChecker`
+
+### Fixed
+
+- Reactivity compatibility with Vue. **Please use `reactive` function**
+
 ## [1.0.5] - 2022-11-21
 
 ### Added

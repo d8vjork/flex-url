@@ -1,0 +1,46 @@
+{
+  "name": "flex-url",
+  "version": "1.1.0",
+  "description": "Zero-dependency utility for parsing and modifying URL params",
+  "homepage": "https://flex-url.opensoutheners.com",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "require": "./dist/index.cjs",
+    "import": "./dist/index.mjs"
+  },
+  "main": "./dist/index.cjs",
+  "unpkg": "./dist/index.umd.js",
+  "module": "./dist/index.mjs",
+  "source": "src/index.ts",
+  "typings": "./dist/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "bundle": "microbundle -f es,cjs,umd",
+    "watch": "yarn run bundle watch",
+    "clean": "rimraf dist",
+    "build": "npm-run-all --silent clean -p bundle",
+    "prepublishOnly": "yarn run build",
+    "test": "c8 --reporter lcov mocha"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.22",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^16.11.10",
+    "c8": "^7.12.0",
+    "chai": "^4.3.4",
+    "microbundle": "^0.14.2",
+    "mocha": "^10.1.0",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.9.3",
+    "xo": "^0.53.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

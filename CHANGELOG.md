@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.5] - 2022-11-21
+
+### Added
+
+- `replace` method to query & filters parameters
+- `toggle` method to filters parameters
+- `append` method to filters parameters
+- Functional `or` & `and` methods in filters parameters
+
+### Changed
+
+- `append` using encoded value instead of `QueryParameter.rawValue` (added raw options)
+- `append` triggering error when no value when indexes were only needed
+
 ## [1.0.4] - 2022-11-20
 
 ### Added

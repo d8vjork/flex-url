@@ -38,16 +38,20 @@ export class QueryParameter {
     return encodeURIComponent(this.#value);
   }
 
+  get rawValue(): string {
+    return this.#value;
+  }
+
   get modifiers(): string[] {
     return this.#modifiers.map(modifier => encodeURIComponent(modifier));
   }
 
   get queryParamKey(): string {
-    return QueryParameter.queryParamKey(this.name, this.modifiers);
+    return QueryParameter.queryParamKey(this.#name, this.#modifiers);
   }
 
   toString(): string {
-    return `${this.queryParamKey}=${this.value}`;
+    return `${QueryParameter.queryParamKey(this.name, this.modifiers)}=${this.value}`;
   }
 
   static fromString(fragment: string): undefined | QueryParameter {
@@ -80,7 +84,7 @@ export class QueryParameterChecker {
   static find(flexUrl: FlexibleUrl, key: string, value?: string, modifiers?: QueryParameterModifiers): number {
     return flexUrl.params.findIndex(queryParameter =>
       queryParameter.queryParamKey === QueryParameter.queryParamKey(key, modifiers)
-        && (value ? queryParameter.value === value : true),
+        && (value ? queryParameter.value.toLocaleLowerCase() === value.toLocaleLowerCase() : true),
     );
   }
 
@@ -90,21 +94,35 @@ export class QueryParameterChecker {
 }
 
 export class QueryParameterManipulator {
-  constructor(private flexUrl: FlexibleUrl, private readonly name: string, private readonly value?: string, modifiers: QueryParameterModifiers = [], private readonly indexes: number[] = []) {
-    this.flexUrl = flexUrl;
-    this.name = name;
-    this.value = value;
-
-    this.indexes = indexes.length > 0
-      ? indexes
-      : getAllIndexes(flexUrl.params, parameter =>
+  constructor(private flexUrl: FlexibleUrl, private readonly name: string, private readonly value?: string, private readonly modifiers: QueryParameterModifiers = [], private readonly indexes: number[] = []) {
+    if (indexes.length === 0) {
+      this.indexes = getAllIndexes(flexUrl.params, parameter =>
         parameter.queryParamKey === QueryParameter.queryParamKey(name, modifiers)
           && (value ? parameter.value === value : true),
       );
+    }
   }
 
-  static fromIndexes(flexUrl: FlexibleUrl, name: string, indexes: number[]): QueryParameterManipulator {
-    return new QueryParameterManipulator(flexUrl, name, undefined, [], indexes);
+  /**
+   * Create instance of QueryParamaterManipulator from known parameters indexes.
+   */
+  static fromIndexes(flexUrl: FlexibleUrl, name: string, indexes: number[], modifiers: QueryParameterModifiers = []): QueryParameterManipulator {
+    return new QueryParameterManipulator(flexUrl, name, undefined, modifiers, indexes);
+  }
+
+  /**
+   * Get underlying Flex URL instance.
+   */
+  get url(): FlexibleUrl {
+    return this.flexUrl;
+  }
+
+  /**
+   * Get if manipulator contains existing parameters.
+   */
+  get exists(): boolean {
+    return this.indexes.length > 0
+      && this.indexes.every((v, i) => Boolean(this.flexUrl.params?.[i]));
   }
 
   /**
@@ -136,18 +154,29 @@ export class QueryParameterManipulator {
   }
 
   /**
+   * Replace value to query parameter.
+   *
+   * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#replace
+   */
+  replace(replacement: string | ((oldValue: string) => string)): this {
+    if (!this.indexes?.length) {
+      throw new Error('Query parameter must be provided to replace to the right parameter.');
+    }
+
+    setValueFromIndexes(this.flexUrl.params, this.indexes, old =>
+      old.setValue(typeof replacement === 'function' ? replacement(old.rawValue) : replacement),
+    );
+
+    return this;
+  }
+
+  /**
    * Append value to query parameter.
    *
    * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#append
    */
   append(appendValue: string): this {
-    if (!this.value && !this.indexes?.length) {
-      throw new Error('Query parameter value must be provided to append to the right parameter.');
-    }
-
-    setValueFromIndexes(this.flexUrl.params, this.indexes, old => old.setValue(`${old.value}${appendValue}`));
-
-    return this;
+    return this.replace(oldValue => `${oldValue}${appendValue}`);
   }
 
   /**

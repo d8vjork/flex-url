@@ -136,6 +136,26 @@ describe('Query Parameters Manipulation', () => {
     expect(url.toString()).to.be.eq(`${baseUrl}?foo=hello`);
   });
 
+  it('Replace query parameter value to a new passing function replaces it to the URL', () => {
+    const url = flexUrl(baseUrl);
+
+    url.queryParam('foo').add('hello');
+
+    url.queryParam('foo').replace(value => `${value} world`);
+
+    expect(url.toString()).to.be.eq(`${baseUrl}?foo=hello%20world`);
+  });
+
+  it('Replace query parameter value to a new passing string replaces it to the URL', () => {
+    const url = flexUrl(baseUrl);
+
+    url.queryParam('foo').add('hello');
+
+    url.queryParam('foo').replace('world');
+
+    expect(url.toString()).to.be.eq(`${baseUrl}?foo=world`);
+  });
+
   it('Append query parameter adds value to already present parameter', () => {
     const url = flexUrl(baseUrl);
 
@@ -152,7 +172,7 @@ describe('Query Parameters Manipulation', () => {
 
     assert.throws(
       () => url.queryParam('foo').append(',hello'),
-      'Query parameter value must be provided to append to the right parameter.',
+      'Query parameter must be provided to replace to the right parameter.',
     );
 
     expect(url.params).to.be.empty;
@@ -192,6 +212,52 @@ describe('Query Parameters Checking', () => {
   });
 });
 
+describe('Query Filter Parameters Manipulation', () => {
+  it('Add filter to URL', () => {
+    const url = flexUrl(baseUrl);
+
+    url.filter('foo').add('bar');
+
+    expect(url.toString()).to.be.eq(`${baseUrl}?filter[foo]=bar`);
+  });
+
+  it('Add AND filters to URL', () => {
+    const url = flexUrl(baseUrl);
+
+    url.filter('foo').add('bar').add('hello');
+
+    expect(url.toString()).to.be.eq(`${baseUrl}?filter[foo]=bar&filter[foo]=hello`);
+  });
+
+  it('Add OR filters to URL', () => {
+    const url = flexUrl(baseUrl);
+
+    url.filter('foo').add('bar').or.add('hello');
+
+    expect(url.toString()).to.be.eq(`${baseUrl}?filter[foo]=bar%2Chello`);
+  });
+
+  it('Add OR filters then add another as AND values in URL', () => {
+    const url = flexUrl(baseUrl);
+
+    url.filter('foo').add('bar').or.add('hello').and.add('test');
+
+    expect(url.toString()).to.be.eq(`${baseUrl}?filter[foo]=bar%2Chello&filter[foo]=test`);
+  });
+
+  it('Add filter then toggle OR values in URL', () => {
+    const url = flexUrl(baseUrl);
+
+    url.filter('foo').add('hello').or.toggle('test');
+
+    expect(url.toString()).to.be.eq(`${baseUrl}?filter[foo]=hello%2Ctest`);
+
+    url.filter('foo').or.toggle('test');
+
+    expect(url.toString()).to.be.eq(`${baseUrl}?filter[foo]=hello`);
+  });
+});
+
 describe('Query Filter Parameters Checking', () => {
   it('Has filter checks query filter parameter with filter key and value is present on the URL', () => {
     const url = flexUrl(baseUrl);
@@ -201,5 +267,32 @@ describe('Query Filter Parameters Checking', () => {
     expect(url.filters.has('foo')).to.be.true;
     expect(url.filters.has('foo', 'bar')).to.be.true;
     expect(url.filters.has('foo', 'hello')).to.be.false;
+  });
+
+  it('Has filter checks query filter parameter with filter key and OR values are present on the URL', () => {
+    const url = flexUrl(baseUrl);
+
+    url.filter('foo').add('bar,hello,world');
+
+    expect(url.filters.has('foo')).to.be.true;
+    expect(url.filters.has('foo', ['bar', 'world', 'hello'])).to.be.true;
+  });
+
+  it('Includes filter checks query filter parameter with filter key and some OR values are present on the URL', () => {
+    const url = flexUrl(baseUrl);
+
+    url.filter('foo').add('bar,hello,world');
+
+    expect(url.filters.includes('foo', ['bar', 'world'])).to.be.true;
+  });
+
+  it('Includes filter checks query filter parameter with filter key and some OR values are not present on an AND filter based URL', () => {
+    const url = flexUrl(baseUrl);
+
+    url.filter('foo').add('bar').add('world');
+
+    expect(url.filters.includes('foo', ['bar', 'world'])).to.be.false;
+    expect(url.filters.includes('foo', ['bar'])).to.be.false;
+    expect(url.filters.includes('foo', 'bar')).to.be.true;
   });
 });

@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "description": "Vue components for flex-url",
   "homepage": "https://flex-url.opensoutheners.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://d8vjork@github.com/open-southeners/flex-url.git",
+    "directory": "packages/vue"
+  },
   "license": "MIT",
   "type": "module",
   "exports": {

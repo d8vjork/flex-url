@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2022-11-22
+
+### Added
+
+- `queryParams.get` method to get parameters as object based on provided key and/or modifier(s)
+- `queryParams.all` method to get all parameters as object
+- `filters.get` method to get filter parameters as object based on provided filter key and/or modifier(s)
+- `filters.all` method to get all filter parameters as object
+
 ## [1.1.0] - 2022-11-21
 
 ### Added

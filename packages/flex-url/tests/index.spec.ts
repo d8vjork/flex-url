@@ -210,6 +210,34 @@ describe('Query Parameters Checking', () => {
 
     expect(url.queryParams.has('foo', 'hello')).to.be.false;
   });
+
+  it('Get query parameter as object with key', () => {
+    const url = flexUrl(baseUrl);
+
+    url.queryParam('foo').add('var');
+
+    expect(url.queryParams.get('foo')).to.be.deep.eq({key: 'foo', value: ['var']});
+  });
+
+  it('Get query parameter as object with key and modifiers getting undefined when none found', () => {
+    const url = flexUrl(baseUrl);
+
+    url.queryParam('filter').add('var', ['foo']);
+
+    expect(url.queryParams.get('filter')).to.be.undefined;
+  });
+
+  it('Get all query parameters as list (array) of objects', () => {
+    const url = flexUrl(baseUrl);
+
+    url.queryParam('foo').add('var');
+    url.queryParam('filter').add('world', ['hello']);
+
+    expect(url.queryParams.all()).to.be.deep.eq({
+      foo: ['var'],
+      'filter[hello]': ['world'],
+    });
+  });
 });
 
 describe('Query Filter Parameters Manipulation', () => {
@@ -294,5 +322,34 @@ describe('Query Filter Parameters Checking', () => {
     expect(url.filters.includes('foo', ['bar', 'world'])).to.be.false;
     expect(url.filters.includes('foo', ['bar'])).to.be.false;
     expect(url.filters.includes('foo', 'bar')).to.be.true;
+  });
+
+  it('Get filter parameter as object with key', () => {
+    const url = flexUrl(baseUrl);
+
+    url.filter('foo').add('bar');
+
+    expect(url.filters.get('foo')).to.be.deep.eq({'filter[foo]': ['bar']});
+  });
+
+  it('Get filter parameter as object with key and modifiers', () => {
+    const url = flexUrl(baseUrl);
+
+    url.filter('foo').add('bar');
+    url.filter('foo').add('hello', ['equal']);
+
+    expect(url.filters.get('foo', ['equal'])).to.be.deep.eq({'filter[foo][equal]': ['hello']});
+  });
+
+  it('Get all filter parameters as object', () => {
+    const url = flexUrl(baseUrl);
+
+    url.filter('foo').add('bar');
+    url.filter('foo').add('hello', ['equal']);
+
+    expect(url.filters.all()).to.be.deep.eq({
+      'filter[foo]': ['bar'],
+      'filter[foo][equal]': ['hello'],
+    });
   });
 });

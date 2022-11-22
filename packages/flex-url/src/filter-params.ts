@@ -1,5 +1,5 @@
 import {type FlexibleUrl} from './flex-url.js';
-import {QueryParameter, QueryParameterManipulator, type QueryParameterModifiers} from './query-params.js';
+import {QueryParameter, QueryParameterManipulator, QueryParameterObject, type QueryParametersObject, type QueryParameterModifiers} from './query-params.js';
 import {getAllIndexes} from './util.js';
 
 export type FilterParameterConditional = 'and' | 'or' | undefined;
@@ -7,7 +7,7 @@ export type FilterParameterConditional = 'and' | 'or' | undefined;
 export class FilterParameterChecker {
   constructor(private readonly flexUrl: FlexibleUrl) {}
 
-  static find(flexUrl: FlexibleUrl, filterKey: string, values: string[], modifiers: QueryParameterModifiers = [], strict = true): number[] {
+  static find(flexUrl: FlexibleUrl, filterKey: string, values: string[], modifiers: QueryParameterModifiers = [], strict = false): number[] {
     const filterValues = values.join(',').toLocaleLowerCase().split(',');
 
     return getAllIndexes(flexUrl.params, parameter => {
@@ -49,6 +49,37 @@ export class FilterParameterChecker {
     }
 
     return FilterParameterChecker.find(this.flexUrl, filterKey, values, modifiers, strict).length > 0;
+  }
+
+  /**
+   * Get filter parameters as an object with provided key and/or modifiers.
+   *
+   * @see Docs https://flex-url.opensoutheners.com/docs/filters#get
+   */
+  get(filterKey?: string, modifiers: QueryParameterModifiers = []): QueryParametersObject {
+    const queryParametersObject: QueryParametersObject = {};
+    const foundFilterParameters = this.flexUrl.params.filter(parameter =>
+      parameter.name === 'filter'
+        && (filterKey ? parameter.modifiers.includes(filterKey) : true)
+        && (modifiers.length > 0 ? parameter.modifiers.filter(modifier => modifiers.includes(modifier)).length === 1 : true),
+    );
+
+    for (let i = 0; i < foundFilterParameters.length; i++) {
+      const filterParameter = foundFilterParameters[i];
+
+      queryParametersObject[filterParameter.queryParamKey] = filterParameter.value.split(',');
+    }
+
+    return queryParametersObject;
+  }
+
+  /**
+   * Get all filter parameters as an object.
+   *
+   * @see Docs https://flex-url.opensoutheners.com/docs/filters#all
+   */
+  all(): QueryParametersObject {
+    return this.get();
   }
 }
 
@@ -99,7 +130,7 @@ export class FilterParameterManipulator {
 
   toggle(value: string, modifiers: QueryParameterModifiers = []): FilterParameterManipulator {
     if (this.conditional === 'or') {
-      const foundIndexes = FilterParameterChecker.find(this.manipulator.url, this.filterKey, [value], modifiers);
+      const foundIndexes = FilterParameterChecker.find(this.manipulator.url, this.filterKey, [value], modifiers, true);
 
       if (foundIndexes.length > 0) {
         return this.set(this.manipulator.url.params[foundIndexes[0]].value.split(',').filter(filterValue => filterValue !== value).join(','));

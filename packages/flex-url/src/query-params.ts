@@ -3,6 +3,13 @@ import {getAllIndexes, setValueFromIndexes} from './util.js';
 
 export type QueryParameterModifiers = string[];
 
+export type QueryParameterObjectValue = string[];
+export type QueryParametersObject = Record<string, QueryParameterObjectValue>;
+export type QueryParameterObject = {
+  key: string;
+  value: QueryParameterObjectValue;
+};
+
 export class QueryParameter {
   constructor(public name: string, public value: string, public modifiers: QueryParameterModifiers = []) {}
 
@@ -77,6 +84,33 @@ export class QueryParameterChecker {
 
   has(key: string, value?: string, modifiers?: QueryParameterModifiers, strict = true): boolean {
     return QueryParameterChecker.find(this.flexUrl, key, value, modifiers, strict) !== -1;
+  }
+
+  all(): QueryParametersObject {
+    const queryParametersObject: QueryParametersObject = {};
+
+    for (let i = 0; i < this.flexUrl.params.length; i++) {
+      const parameter = this.flexUrl.params[i];
+
+      queryParametersObject[parameter.queryParamKey] = parameter.value.split(',');
+    }
+
+    return queryParametersObject;
+  }
+
+  get(key: string, modifiers?: QueryParameterModifiers): QueryParameterObject | undefined {
+    const foundIndex = QueryParameterChecker.find(this.flexUrl, key, undefined, modifiers);
+
+    if (foundIndex === -1) {
+      return undefined;
+    }
+
+    const foundParameter = this.flexUrl.params[foundIndex];
+
+    return {
+      key: foundParameter.queryParamKey,
+      value: foundParameter.value.split(','),
+    };
   }
 }
 

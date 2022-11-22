@@ -1,28 +1,33 @@
-import {defineComponent, h, reactive, watch} from 'vue';
+import {defineComponent, h} from 'vue';
+import {Inertia} from '@inertiajs/inertia';
 import {FilterableList, type FilterableListProps} from './filterable-list.js';
 
 export type InertiaFilterableListProps = {
   /**
    * If provided, Inertia will reload only this page prop
    */
-  dataProp?: string;
+  dataProp: string;
 } & FilterableListProps;
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const InertiaFilterableList = defineComponent<InertiaFilterableListProps>({
   name: 'InertiaFilterableList',
 
-  emits: ['update'],
+  props: ['dataProp', 'as', 'usingOr'] as unknown as undefined,
 
-  props: ['as', 'usingOr', 'dataProp'] as unknown as undefined,
+  setup(props, {slots}) {
+    const onUpdate = (url: string) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      Inertia.visit(url, {
+        only: [props.dataProp],
+        preserveScroll: true,
+        preserveState: true,
+      });
+    };
 
-  setup(props, {slots, emit}) {
     return () => {
       h(FilterableList, {
         ...props,
-        onUpdate(value: string) {
-          emit('update', value);
-        },
+        onUpdate,
       }, {
         default: (data: unknown) => slots.default?.(data),
       });

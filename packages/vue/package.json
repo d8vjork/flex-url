@@ -1,6 +1,6 @@
 {
   "name": "@flex-url/vue",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Vue components for flex-url",
   "homepage": "https://flex-url.opensoutheners.com",
   "repository": {
@@ -24,7 +24,7 @@
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "bundle": "microbundle -f es,cjs,umd",
+    "bundle": "microbundle -f es,cjs,umd --globals @inertiajs/inertia",
     "watch": "yarn run bundle watch",
     "clean": "rimraf dist",
     "build": "npm-run-all --silent clean -p bundle",
@@ -34,7 +34,11 @@
     "flex-url": "workspace:^",
     "vue": "^3.2.45"
   },
+  "peerDependencies": {
+    "@inertiajs/inertia": "^0.11"
+  },
   "devDependencies": {
+    "@inertiajs/inertia": "^0.11.1",
     "microbundle": "^0.14.2",
     "npm-run-all": "^4.1.5",
     "rimraf": "^3.0.2",

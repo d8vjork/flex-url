@@ -1,4 +1,4 @@
-import {type ComponentPublicInstance, defineComponent, h, watch, reactive, Fragment} from 'vue';
+import {type ComponentPublicInstance, defineComponent, h, watch, reactive, Fragment, type ComputedOptions, type MethodOptions} from 'vue';
 import {flexUrl} from 'flex-url';
 
 export type FilterableListProps = {
@@ -17,11 +17,10 @@ export type FilterableListProps = {
   usingOr?: boolean;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const FilterableList = defineComponent<FilterableListProps>({
   name: 'FilterableList',
 
-  emits: ['update'],
+  emits: ['update'] as unknown as undefined,
 
   props: ['as', 'usingOr'] as unknown as undefined,
 

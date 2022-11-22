@@ -1,6 +1,6 @@
 {
   "name": "flex-url",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Zero-dependency utility for parsing and modifying URL params",
   "homepage": "https://flex-url.opensoutheners.com",
   "repository": {

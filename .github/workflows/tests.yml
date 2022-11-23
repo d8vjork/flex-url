@@ -13,17 +13,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Setup Node.js
       - uses: actions/setup-node@v3
         with:
           node-version: 14
-      - name: install dependencies and test
-        run: |
-          yarn install
-          yarn test
+          cache: yarn
+
+      - name: Get Yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+
+      - uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run tests
+        run: yarn test
         env:
           CI: true
       
-      - name: Deploy coverage to codacy
+      - name: Deploy coverage to Codacy
         uses: codacy/codacy-coverage-reporter-action@v1
         with:
           # project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}

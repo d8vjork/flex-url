@@ -7,11 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2022-11-23
+
+### Changed
+
+- `filters.get(key)` now only gets an array or object without having the same keyed object as `filters.all()` (we know what the key is)
+
 ## [1.5.0] - 2022-11-23
 
 ### Changed
 
-- `filters.all()` & `filters.get(key)` methods now returns an keyed by filter key (`filter[name]` changed to `name`) and possibly returning an array of objects including modifiers (`{'filter[name][modifier1][modifier2]': ['value1', 'value2'] ...}` to `name: {modifiers: ['modifier1', 'modifier2'], value: ['value1', 'value2']}`) 
+- `filters.all()` & `filters.get(key)` methods now returns an keyed by filter key (`filter[name]` changed to `name`) and possibly returning an array of objects including modifiers (`{'filter[name][modifier1][modifier2]': ['value1', 'value2'] ...}` to `name: {modifiers: ['modifier1', 'modifier2'], value: ['value1', 'value2']}`)
+
+### Fixed
+
+- `filters.all()` & `filters.get(key)` returning AND filters being impossible as an object with same keys
 
 ## [1.4.0] - 2022-11-23
 

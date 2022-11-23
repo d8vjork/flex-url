@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2022-11-23
+
+### Added
+
+- `sort` to modify sort parameter values
+- `sorts` method to check sort parameter values (sorted as ascendant or descendant)
+
 ## [1.2.0] - 2022-11-22
 
 ### Added

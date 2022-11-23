@@ -351,7 +351,7 @@ describe('Query Filter Parameters Checking', () => {
 
     url.filter('foo').add('bar');
 
-    expect(url.filters.get('foo')).to.be.deep.eq({foo: {modifiers: [], value: ['bar']}});
+    expect(url.filters.get('foo')).to.be.deep.eq({modifiers: [], value: ['bar']});
   });
 
   it('Get filter parameter as object with key and modifiers', () => {
@@ -360,7 +360,7 @@ describe('Query Filter Parameters Checking', () => {
     url.filter('foo').add('bar');
     url.filter('foo').add('hello', ['equal']);
 
-    expect(url.filters.get('foo', ['equal'])).to.be.deep.eq({foo: {modifiers: ['equal'], value: ['hello']}});
+    expect(url.filters.get('foo', ['equal'])).to.be.deep.eq({modifiers: ['equal'], value: ['hello']});
   });
 
   it('Get all filter parameters as object', () => {

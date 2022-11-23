@@ -63,7 +63,9 @@ export class FilterParameterChecker {
    *
    * @see Docs https://flex-url.opensoutheners.com/docs/filters#get
    */
-  get(filterKey?: string, modifiers: QueryParameterModifiers = []): FilterParametersObject {
+  get(filterKey?: undefined, modifiers?: undefined): FilterParametersObject;
+  get(filterKey: string, modifiers?: QueryParameterModifiers): FilterParameterObjectValue | FilterParameterObjectValue[];
+  get(filterKey?: string, modifiers: QueryParameterModifiers = []): FilterParametersObject | FilterParameterObjectValue | FilterParameterObjectValue[] {
     const queryParametersObject: FilterParametersObject = {};
     const foundFilterParameters = this.flexUrl.params.filter(parameter =>
       parameter.name === 'filter'
@@ -90,7 +92,7 @@ export class FilterParameterChecker {
       queryParametersObject[parameterObjectKey] = parameterObjectValue;
     }
 
-    return queryParametersObject;
+    return filterKey ? queryParametersObject[filterKey] : queryParametersObject;
   }
 
   /**

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2022-11-23
+
+### Changed
+
+- `filters.all()` & `filters.get(key)` methods now returns an keyed by filter key (`filter[name]` changed to `name`) and possibly returning an array of objects including modifiers (`{'filter[name][modifier1][modifier2]': ['value1', 'value2'] ...}` to `name: {modifiers: ['modifier1', 'modifier2'], value: ['value1', 'value2']}`) 
+
 ## [1.4.0] - 2022-11-23
 
 ### Added

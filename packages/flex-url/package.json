@@ -2,10 +2,13 @@
   "name": "flex-url",
   "version": "1.3.0",
   "description": "Zero-dependency utility for parsing and modifying URL params",
-  "homepage": "https://flex-url.opensoutheners.com",
+  "homepage": "https://github.com/open-southeners/flex-url#readme",
+  "bugs": {
+    "url": "https://github.com/open-southeners/flex-url/issues"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://d8vjork@github.com/open-southeners/flex-url.git",
+    "url": "https://github.com/open-southeners/flex-url.git",
     "directory": "packages/flex-url"
   },
   "license": "MIT",

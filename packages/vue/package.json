@@ -2,11 +2,14 @@
   "name": "@flex-url/vue",
   "version": "0.1.2",
   "description": "Vue components for flex-url",
-  "homepage": "https://flex-url.opensoutheners.com",
+  "homepage": "https://github.com/open-southeners/flex-url#readme",
+  "bugs": {
+    "url": "https://github.com/open-southeners/flex-url/issues"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://d8vjork@github.com/open-southeners/flex-url.git",
-    "directory": "packages/vue"
+    "url": "https://github.com/open-southeners/flex-url.git",
+    "directory": "packages/flex-url"
   },
   "license": "MIT",
   "type": "module",

@@ -124,7 +124,7 @@ export class FilterParameterManipulator {
     return new FilterParameterManipulator(this.manipulator.append(value), this.filterKey);
   }
 
-  remove(value: string, modifiers: QueryParameterModifiers = []): FlexibleUrl {
+  remove(value?: string, modifiers: QueryParameterModifiers = []): FlexibleUrl {
     return this.manipulator.remove(value, [this.filterKey, ...modifiers]);
   }
 

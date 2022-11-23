@@ -178,6 +178,28 @@ describe('Query Parameters Manipulation', () => {
     expect(url.params).to.be.empty;
   });
 
+  it('Remove query parameter by key', () => {
+    const url = flexUrl(baseUrl);
+
+    url.queryParam('foo').add('bar');
+    url.queryParam('foo').add('test');
+    url.queryParam('foo').remove();
+
+    // Expect(url.params).to.be.empty;
+    expect(url.toString()).to.be.eq(baseUrl);
+  });
+
+  it('Remove query parameter by key and value', () => {
+    const url = flexUrl(baseUrl);
+
+    url.queryParam('foo').add('bar');
+    url.queryParam('foo').add('test');
+    url.queryParam('foo').remove('bar');
+
+    expect(url.params).to.be.lengthOf(1);
+    expect(url.toString()).to.be.eq(`${baseUrl}?foo=test`);
+  });
+
   it('Clear removes all parameters from URL', () => {
     const url = flexUrl(baseUrl);
 
@@ -351,6 +373,32 @@ describe('Query Filter Parameters Checking', () => {
       'filter[foo]': ['bar'],
       'filter[foo][equal]': ['hello'],
     });
+  });
+});
+
+describe('Query Sort Parameter Manipulation', () => {
+  it('Sort by asc', () => {
+    const url = flexUrl(baseUrl);
+
+    url.sort().toggle('foo');
+
+    expect(url.toString()).to.be.eq(`${baseUrl}?sort=foo`);
+  });
+
+  it('Sort by desc', () => {
+    const url = flexUrl(baseUrl);
+
+    url.sort().toggle('foo').desc.toggle('bar');
+
+    expect(url.toString()).to.be.eq(`${baseUrl}?sort=foo%2C-bar`);
+  });
+
+  it('Sort by desc (taking preference of second argument)', () => {
+    const url = flexUrl(baseUrl);
+
+    url.sort().toggle('foo').desc.toggle('bar', 'asc');
+
+    expect(url.toString()).to.be.eq(`${baseUrl}?sort=foo%2Cbar`);
   });
 });
 

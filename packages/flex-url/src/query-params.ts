@@ -222,15 +222,22 @@ export class QueryParameterManipulator {
    *
    * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#remove
    */
-  remove(value: string, modifiers: QueryParameterModifiers = [], index?: number): FlexibleUrl {
-    const existing = index ?? QueryParameterChecker.find(this.flexUrl, this.name, value, modifiers);
+  remove(value?: string, modifiers: QueryParameterModifiers = [], index?: number): FlexibleUrl {
+    this.flexUrl.params = this.flexUrl.params.filter((parameter, i) => {
+      if (index) {
+        return index === i;
+      }
 
-    if (existing !== -1) {
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete this.flexUrl.params[existing];
+      if (parameter.queryParamKey !== QueryParameter.queryParamKey(this.name, modifiers)) {
+        return true;
+      }
 
-      this.flexUrl.params = this.flexUrl.params.filter(Boolean);
-    }
+      if (value) {
+        return !parameter.value.includes(value);
+      }
+
+      return false;
+    });
 
     return this.flexUrl;
   }

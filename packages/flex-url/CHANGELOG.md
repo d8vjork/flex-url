@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2022-11-23
+
+### Added
+
+- `remove` making all arguments optional, so it removes all query parameters with same key
+
 ## [1.3.0] - 2022-11-23
 
 ### Added

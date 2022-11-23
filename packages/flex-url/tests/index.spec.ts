@@ -353,3 +353,16 @@ describe('Query Filter Parameters Checking', () => {
     });
   });
 });
+
+describe('Query Sort Parameter Checking', () => {
+  it('Get all sort parameter values as object', () => {
+    const url = flexUrl(baseUrl);
+
+    url.sort().toggle('foo').desc.toggle('bar');
+
+    expect(url.sorts.all()).to.be.deep.eq({
+      foo: 'asc',
+      bar: 'desc',
+    });
+  });
+});

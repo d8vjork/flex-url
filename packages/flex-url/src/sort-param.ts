@@ -7,16 +7,16 @@ export type SortParameterValuesAsObject = Record<string, SortDirection>;
 export class SortParameterChecker {
   constructor(private readonly flexUrl: FlexibleUrl) {}
 
-  hasSort(value: string, direction: SortDirection = 'asc'): boolean {
+  has(value: string, direction: SortDirection = 'asc'): boolean {
     return this.flexUrl.queryParams.has('sort', direction === 'asc' ? value : `-${value}`);
   }
 
-  sortedByAsc(value: string): boolean {
-    return this.hasSort(value);
+  byAsc(value: string): boolean {
+    return this.has(value);
   }
 
-  sortedByDesc(value: string): boolean {
-    return this.hasSort(value, 'desc');
+  byDesc(value: string): boolean {
+    return this.has(value, 'desc');
   }
 
   all(): Record<string, SortDirection> {
@@ -42,7 +42,7 @@ export class SortParameterChecker {
 export class SortParameterManipulator {
   private direction: SortDirection = 'asc';
 
-  constructor(private readonly manipulator: QueryParameterManipulator) {}
+  constructor(private readonly sortParameter: QueryParameterManipulator) {}
 
   static fromUrl(flexUrl: FlexibleUrl): SortParameterManipulator {
     return new SortParameterManipulator(flexUrl.queryParam('sort'));
@@ -60,7 +60,7 @@ export class SortParameterManipulator {
     return this;
   }
 
-  sort(value: string, direction?: SortDirection) {
+  toggle(value: string, direction?: SortDirection) {
     const sortDirection = direction ?? this.direction;
     let sortValue = value;
     let possiblyPreviousValue = `-${value}`;
@@ -70,7 +70,11 @@ export class SortParameterManipulator {
       possiblyPreviousValue = value;
     }
 
-    return new SortParameterManipulator(this.manipulator.replace(oldValue => {
+    if (!this.sortParameter.exists) {
+      return new SortParameterManipulator(this.sortParameter.add(sortValue));
+    }
+
+    return new SortParameterManipulator(this.sortParameter.replace(oldValue => {
       const parameterValues = oldValue.split(',');
       const foundPreviousValue = parameterValues.indexOf(possiblyPreviousValue);
 

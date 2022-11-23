@@ -1,6 +1,13 @@
 import {type FlexibleUrl} from './flex-url.js';
-import {QueryParameter, QueryParameterManipulator, QueryParameterObject, type QueryParametersObject, type QueryParameterModifiers} from './query-params.js';
+import {QueryParameter, QueryParameterManipulator, type QueryParametersObject, type QueryParameterModifiers} from './query-params.js';
 import {getAllIndexes} from './util.js';
+
+export type FilterParameterObjectValue = {
+  modifiers: string[];
+  value: string[];
+};
+
+export type FilterParametersObject = Record<string, FilterParameterObjectValue | FilterParameterObjectValue[]>;
 
 export type FilterParameterConditional = 'and' | 'or' | undefined;
 
@@ -56,8 +63,8 @@ export class FilterParameterChecker {
    *
    * @see Docs https://flex-url.opensoutheners.com/docs/filters#get
    */
-  get(filterKey?: string, modifiers: QueryParameterModifiers = []): QueryParametersObject {
-    const queryParametersObject: QueryParametersObject = {};
+  get(filterKey?: string, modifiers: QueryParameterModifiers = []): FilterParametersObject {
+    const queryParametersObject: FilterParametersObject = {};
     const foundFilterParameters = this.flexUrl.params.filter(parameter =>
       parameter.name === 'filter'
         && (filterKey ? parameter.modifiers.includes(filterKey) : true)
@@ -66,8 +73,21 @@ export class FilterParameterChecker {
 
     for (let i = 0; i < foundFilterParameters.length; i++) {
       const filterParameter = foundFilterParameters[i];
+      const parameterObjectKey = filterParameter.modifiers[0];
+      let parameterObjectValue: FilterParameterObjectValue | FilterParameterObjectValue[] = {
+        modifiers: filterParameter.modifiers.slice(1),
+        value: filterParameter.value.split(','),
+      };
 
-      queryParametersObject[filterParameter.queryParamKey] = filterParameter.value.split(',');
+      if (parameterObjectKey in queryParametersObject) {
+        // eslint-disable-next-line unicorn/prefer-spread
+        parameterObjectValue = ([] as FilterParameterObjectValue[]).concat(
+          queryParametersObject[parameterObjectKey],
+          parameterObjectValue,
+        );
+      }
+
+      queryParametersObject[parameterObjectKey] = parameterObjectValue;
     }
 
     return queryParametersObject;
@@ -78,7 +98,7 @@ export class FilterParameterChecker {
    *
    * @see Docs https://flex-url.opensoutheners.com/docs/filters#all
    */
-  all(): QueryParametersObject {
+  all(): FilterParametersObject {
     return this.get();
   }
 }

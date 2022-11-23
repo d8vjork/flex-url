@@ -1,5 +1,6 @@
 import {FilterParameterManipulator, FilterParameterChecker} from './filter-params.js';
 import {QueryParameter, QueryParameterChecker, QueryParameterManipulator} from './query-params.js';
+import {SortParameterChecker, SortParameterManipulator} from './sort-param.js';
 
 export class FlexibleUrl {
   params: QueryParameter[] = [];
@@ -66,6 +67,24 @@ export class FlexibleUrl {
    */
   get filters(): FilterParameterChecker {
     return new FilterParameterChecker(this);
+  }
+
+  /**
+   * Manipulate URL query sort parameter values
+   *
+   * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#sort
+   */
+  sort(): SortParameterManipulator {
+    return SortParameterManipulator.fromUrl(this);
+  }
+
+  /**
+   * Check URL query sort parameter values
+   *
+   * @see Docs https://flex-url.opensoutheners.com/docs/queryParams#sorts
+   */
+  get sorts(): SortParameterChecker {
+    return new SortParameterChecker(this);
   }
 
   /**

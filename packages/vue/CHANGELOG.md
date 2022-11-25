@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- InertiaFilterableList not returning default slot
+- `InertiaFilterableList` not returning default slot
 
 ## [0.1.2] - 2022-11-22
 

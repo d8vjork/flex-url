@@ -24,13 +24,13 @@ export const InertiaFilterableList = defineComponent<InertiaFilterableListProps>
       });
     };
 
-    return () => {
-      h(FilterableList, {
-        ...props,
-        onUpdate,
-      }, {
-        default: (data: unknown) => slots.default?.(data),
-      });
-    };
+    return () => h(FilterableList, {
+      ...props,
+      onUpdate(url: string) {
+        onUpdate(url);
+      },
+    }, {
+      default: (data: unknown) => slots.default?.(data),
+    });
   },
 });
